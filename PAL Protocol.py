@@ -58,6 +58,7 @@ class Experiment_Staging(FloatLayout):
     def instruction_presentation(self,instance):
 
         self.id_no = self.id_entry.text
+        self.id_entry.hide_keyboard()
         self.remove_widget(self.id_instruction)
         self.remove_widget(self.id_entry)
         self.remove_widget(self.id_button)
@@ -114,19 +115,21 @@ class Experiment_Staging(FloatLayout):
         self.trial_presentation()
 
     def set_new_trial_configuration(self):
+        self.data_file.write("\n")
+        self.data_file.write("%s,%s,%s,%s,%s" % (self.current_trial,self.trial_type[self.curr_trial_type],self.current_correction,self.current_correct,self.lat))
+        self.data_file.close()
+        self.current_correction = 0
         self.curr_trial_type = random.randint(0,5)
         self.current_trial += 1
-        self.record_data()
+        self.ITI_interval()
 
     def record_data(self):
         self.data_file = open(self.participant_data_path, "a")
         self.data_file.write("\n")
         self.data_file.write("%s,%s,%s,%s,%s" % (self.current_trial,self.trial_type[self.curr_trial_type],self.current_correction,self.current_correct,self.lat))
         self.data_file.close()
-        if self.current_correct == 0:
-            self.current_correction = 1
-        elif self.current_correct == 1:
-            self.current_correction = 0
+
+        self.current_correction = 1
 
         self.ITI_interval()
 
