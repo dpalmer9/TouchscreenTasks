@@ -115,6 +115,7 @@ class Experiment_Staging(FloatLayout):
         self.trial_presentation()
 
     def set_new_trial_configuration(self):
+        self.data_file = open(self.participant_data_path, "a")
         self.data_file.write("\n")
         self.data_file.write("%s,%s,%s,%s,%s" % (self.current_trial,self.trial_type[self.curr_trial_type],self.current_correction,self.current_correct,self.lat))
         self.data_file.close()
