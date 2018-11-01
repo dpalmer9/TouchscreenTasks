@@ -1,3 +1,6 @@
+from kivy.config import Config
+Config.set('kivy', 'keyboard_mode', 'systemandmulti')
+#Config.set('graphics', 'fullscreen', '1')
 import kivy
 from kivy.app import App
 from kivy.uix.widget import Widget
@@ -7,10 +10,10 @@ from kivy.uix.label import Label
 from kivy.uix.floatlayout import FloatLayout
 from win32api import GetSystemMetrics
 from kivy.core.window import Window
-from kivy.config import Config
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.clock import Clock
-from kivy.uix.textinput import  TextInput
+from kivy.uix.textinput import TextInput
+from kivy.uix.vkeyboard import VKeyboard
 import random
 import os
 import time
@@ -40,6 +43,7 @@ class Experiment_Staging(FloatLayout):
         self.id_entry = TextInput(text='', multiline=False)
         self.id_entry.size_hint = (.3,.1)
         self.id_entry.pos = ((self.center_x - (0.15 * self.monitor_x_dim)),(self.center_y - (0.05*self.monitor_y_dim) + (-0.3*self.monitor_y_dim)))
+
 
         self.id_button = Button(text='OK')
         self.id_button.size_hint = (.1,.1)
@@ -208,7 +212,6 @@ class PALApp(App):
         return experiment
 
 if __name__ == '__main__':
-    Config.set('graphics','fullscreen','1')
     monitor_x_dim = GetSystemMetrics(0)
     monitor_y_dim = GetSystemMetrics(1)
     Window.size = (monitor_x_dim,monitor_y_dim)
