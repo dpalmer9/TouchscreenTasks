@@ -41,6 +41,8 @@ class Experiment_Staging(FloatLayout):
         self.next_stage = 1
         self.stage_executed = False
 
+        self.delay_length = 4
+
         self.max_trials = 72
         self.max_time = 3600
 
@@ -68,6 +70,15 @@ class Experiment_Staging(FloatLayout):
         self.choice_y_shift = random.randint(1,4)
         while self.choice_y_shift == 0:
             self.choice_y_shift = random.randint(-3, 3)
+
+        if (self.choice_x_shift == self.sample_x_shift) and (self.choice_y_shift == self.sample_y_shift):
+            while (self.choice_x_shift == self.sample_x_shift) or (self.choice_y_shift == self.sample_y_shift):
+                self.choice_x_shift = random.randint(-3, 3)
+                while self.choice_x_shift == 0:
+                    self.choice_x_shift = random.randint(-3, 3)
+                self.choice_y_shift = random.randint(-2, 2)
+                while self.choice_y_shift == 0:
+                    self.choice_y_shift = random.randint(-2, 2)
 
         self.lat = 0
         self.init_lat = 0
@@ -158,16 +169,57 @@ class Experiment_Staging(FloatLayout):
     def sample_presentation(self):
         self.sample_image_wid = ImageButton(source='%s\\Images\\white.png' % (self.curr_dir), allow_stretch=True)
         self.sample_image_wid.size_hint = (.1,.1)
-        self.sample_image_wid.pos = ((self.center_x - (0.05 * self.monitor_x_dim) + (self.sample_x_shift * 0.05 * self.monitor_x_dim)), (self.center_y - (0.05*self.monitor_y_dim) + (self.sample_y_shift * 0.05 * self.monitor_x_dim)))
-        self.sample_image_wid.bind(on_press = lambda new_stage: self.stage_shift(new_stage=9))
+        self.sample_image_wid.pos = ((self.center_x + ((self.sample_x_shift * 0.12) * self.monitor_y_dim)), (self.center_y + ((self.sample_y_shift * 0.12) * self.monitor_y_dim)))
+        self.sample_image_wid.bind(on_press = lambda new_stage: self.stage_shift(new_stage=8))
 
         self.add_widget(self.sample_image_wid)
+
+        self.image_pres_time = time.time()
+
+    def sample_pressed(self):
+        self.remove_widget(self.sample_image_wid)
+        self.delay_start = time.time()
+        self.delay_clock_start = False
+        self.stage_shift(new_stage=9)
+
+    def sample_delay_end(self,*args):
+        if self.delay_clock_start == False:
+            Clock.schedule_interval(self.sample_delay_end, 0.01)
+            self.delay_clock_start = True
+        if (self.current_time - self.delay_start) >= self.iti_time:
+            Clock.unschedule(self.sample_delay_end)
+            self.initiation_image_wid = ImageButton(source='%s\\Images\\white.png' % (self.curr_dir),
+                                                    allow_stretch=True)
+            self.initiation_image_wid.size_hint = (.16, .16)
+            self.initiation_image_wid.pos = ((self.center_x - (0.08 * self.monitor_x_dim)),
+                                             (self.center_y - (0.08 * self.monitor_y_dim) - (0.4 * self.monitor_y_dim)))
+            self.initiation_image_wid.bind(on_press=lambda new_stage: self.stage_shift(new_stage=10))
+            self.add_widget(self.initiation_image_wid)
+
+    def choice_presentation(self):
+        self.delay_end = time.time()
+        self.delay_length = self.delay_end - self.delay_start
+        self.remove_widget(self.initiation_image_wid)
+
+        self.sample_image_wid = ImageButton(source='%s\\Images\\white.png' % (self.curr_dir), allow_stretch=True)
+        self.sample_image_wid.size_hint = (.1,.1)
+        self.sample_image_wid.pos = ((self.center_x + ((self.sample_x_shift * 0.12) * self.monitor_y_dim)), (self.center_y + ((self.sample_y_shift * 0.12) * self.monitor_y_dim)))
+        self.sample_image_wid.bind(on_press = lambda new_stage: self.stage_shift(new_stage=11))
+
+        self.choice_image_wid = ImageButton(source='%s\\Images\\white.png' % (self.curr_dir), allow_stretch=True)
+        self.choice_image_wid.size_hint = (.1,.1)
+        self.choice_image_wid.pos = ((self.center_x + ((self.choice_x_shift * 0.12) * self.monitor_y_dim)), (self.center_y + ((self.choice_y_shift * 0.12) * self.monitor_y_dim)))
+        self.choice_image_wid.bind(on_press = lambda new_stage: self.stage_shift(new_stage=12))
+
+        self.add_widget(self.sample_image_wid)
+        self.add_widget(self.choice_image_wid)
 
         self.image_pres_time = time.time()
 
     def response_correct(self):
         self.image_touch_time = time.time()
         self.remove_widget(self.sample_image_wid)
+        self.remove_widget(self.choice_image_wid)
 
         self.lat = self.image_touch_time - self.image_pres_time
 
@@ -176,15 +228,15 @@ class Experiment_Staging(FloatLayout):
         self.correction_active = False
         self.feedback_string = 'CORRECT'
 
-        #self.record_data()
-        self.stage_shift(new_stage=10)
+        self.record_data()
+        self.stage_shift(new_stage=13)
 
 
 
     def response_incorrect(self):
         self.image_touch_time = time.time()
-        self.remove_widget(self.correct_image_wid)
-        self.remove_widget(self.incorrect_image_wid)
+        self.remove_widget(self.choice_image_wid)
+        self.remove_widget(self.sample_image_wid)
 
         self.lat = self.image_touch_time - self.image_pres_time
 
@@ -194,12 +246,12 @@ class Experiment_Staging(FloatLayout):
 
         self.current_correct = 0
         self.record_data()
-        self.stage_shift(new_stage=11)
+        self.stage_shift(new_stage=14)
 
     def record_data(self):
         self.data_file = open(self.participant_data_path, "a")
         self.data_file.write("\n")
-        self.data_file.write("%s,%s,%s,%s,%s,%s" % (self.current_trial,self.trial_type[self.curr_trial_type],self.current_correction,self.current_correct,self.lat,self.init_lat))
+        self.data_file.write("%s,[%s][%s]/[%s][%s],%s,%s,%s,%s" % (self.current_trial,self.sample_x_shift,self.sample_y_shift,self.choice_x_shift,self.choice_y_shift,self.current_correction,self.current_correct,self.lat,self.init_lat))
         self.data_file.close()
 
         if self.current_correct == 0:
@@ -220,15 +272,25 @@ class Experiment_Staging(FloatLayout):
         self.choice_x_shift = 1
         self.choice_y_shift = 1
 
-        self.choice_x_shift = random.randint(1,6)
+        self.choice_x_shift = random.randint(-3,3)
         while self.choice_x_shift == 0:
             self.choice_x_shift = random.randint(-3, 3)
-        self.choice_y_shift = random.randint(1,4)
+        self.choice_y_shift = random.randint(-2,2)
         while self.choice_y_shift == 0:
-            self.choice_y_shift = random.randint(-3, 3)
+            self.choice_y_shift = random.randint(-2, 2)
+
+        while (self.choice_x_shift == self.sample_x_shift) and (self.choice_y_shift == self.sample_y_shift):
+            if (self.choice_x_shift == self.sample_x_shift) and (self.choice_y_shift == self.sample_y_shift):
+                while (self.choice_x_shift == self.sample_x_shift) and (self.choice_y_shift == self.sample_y_shift):
+                    self.choice_x_shift = random.randint(1, 6)
+                    while self.choice_x_shift == 0:
+                        self.choice_x_shift = random.randint(-3, 3)
+                    self.choice_y_shift = random.randint(1, 4)
+                    while self.choice_y_shift == 0:
+                        self.choice_y_shift = random.randint(-3, 3)
 
         self.current_trial += 1
-        self.stage_shift(new_stage=11)
+        self.stage_shift(new_stage=14)
 
     def start_iti(self):
         self.start_iti_time = time.time()
@@ -237,7 +299,7 @@ class Experiment_Staging(FloatLayout):
         self.feedback_wid.pos = ((self.center_x - (0.25 * self.monitor_x_dim)),(self.center_y - (0.15*self.monitor_y_dim)))
         self.add_widget(self.feedback_wid)
         self.iti_clock_trigger = False
-        self.stage_shift(new_stage=12)
+        self.stage_shift(new_stage=15)
 
     def end_iti(self,*args):
         if self.iti_clock_trigger == False:
@@ -268,14 +330,20 @@ class Experiment_Staging(FloatLayout):
         elif self.current_stage == 7:
             self.sample_presentation()
         elif self.current_stage == 8:
-            self.response_incorrect()
+            self.sample_pressed()
         elif self.current_stage == 9:
-            self.response_correct()
+            self.sample_delay_end()
         elif self.current_stage == 10:
-            self.set_new_trial_configuration()
+            self.choice_presentation()
         elif self.current_stage == 11:
-            self.start_iti()
+            self.response_incorrect()
         elif self.current_stage == 12:
+            self.response_correct()
+        elif self.current_stage == 13:
+            self.set_new_trial_configuration()
+        elif self.current_stage == 14:
+            self.start_iti()
+        elif self.current_stage == 15:
             self.end_iti()
 
     def clock_update(self,*args):
