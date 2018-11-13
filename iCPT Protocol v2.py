@@ -241,6 +241,7 @@ class Experiment_Staging(FloatLayout):
         self.correction_active = True
         self.current_correct = 2
         self.lat = ''
+        self.record_data()
         self.stage_shift(new_stage=13)
 
     def record_data(self):
