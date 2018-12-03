@@ -52,6 +52,7 @@ class Experiment_Staging(FloatLayout):
 
         self.current_trial = 1
         self.current_total_hits = 0
+        self.current_stage = 1
         self.time_elapsed = 0
         self.start_time = time.time()
         self.start_iti_time = 0
@@ -64,7 +65,27 @@ class Experiment_Staging(FloatLayout):
         self.image_list = ['horizontal','horizontal','horizontal','horizontal','vertical','left','right','rings']
         self.image_list_pos = random.randint(0,7)
 
+        self.contrast_list = ['','-50','-25','-125']
+        self.contrast_list_pos = random.randint(0,3)
+        self.image_name_contrast = '%s%s' % (
+        self.image_list[self.image_list_pos], self.contrast_list[self.contrast_list_pos])
 
+        self.distractor_active = random.randint(0,1)
+        self.distractor_congruent = random.randint(0,1)
+        if self.distractor_active == 1:
+            if self.distractor_congruent == 0:
+                if self.image_list[self.image_list_pos] == 'horizontal':
+                    self.distractor_image_pos = random.randint(4, 7)
+                else:
+                    self.distractor_image_pos = 0
+            elif self.distractor_congruent == 1:
+                self.distractor_image_pos = self.image_list_pos
+
+        self.stimulus_duration_list = [1,0.75,0.66,0.5]
+        self.stimulus_duration_pos = random.randint(0,3)
+
+        self.iti_duration_list = [0.5,1,2]
+        self.iti_duration_pos = random.randint(0,2)
 
         self.lat = 0
         self.init_lat = 0
@@ -164,11 +185,33 @@ class Experiment_Staging(FloatLayout):
     def image_presentation(self,*args):
         if self.image_on_screen == False:
             self.delay_hold_button.unbind(on_release=self.premature_response)
-            self.image_wid = ImageButton(source='%s\\Images\\%s.png' % (self.curr_dir,self.image_list[self.image_list_pos]), allow_stretch=True)
+            if self.current_stage == 2:
+                self.image_wid = ImageButton(
+                    source='%s\\Images\\%s.png' % (self.curr_dir, self.image_name_contrast),
+                    allow_stretch=True)
+            else:
+                self.image_wid = ImageButton(source='%s\\Images\\%s.png' % (self.curr_dir,self.image_list[self.image_list_pos]), allow_stretch=True)
+                
             self.image_wid.size_hint = (.3, .3)
             self.image_wid.pos = (
             (self.center_x - (0.15 * self.monitor_x_dim)), (self.center_y - (0.15 * self.monitor_y_dim)))
             self.image_wid.bind(on_press= self.image_pressed)
+            if self.current_stage == 3 and self.distractor_active == 1:
+                self.distractor_one_wid = ImageButton(source='%s\\Images\\%s.png' % (self.curr_dir,self.image_list[self.distractor_image_pos]), allow_stretch=True)
+                self.distractor_one_wid.size_hint = (.3, .3)
+                self.distractor_one_wid.pos = (
+                    (self.center_x - (0.15 * self.monitor_x_dim) - (0.25 * self.monitor_x_dim)), (self.center_y - (0.15 * self.monitor_y_dim)))
+
+                self.distractor_two_wid = ImageButton(
+                    source='%s\\Images\\%s.png' % (self.curr_dir, self.image_list[self.distractor_image_pos]),
+                    allow_stretch=True)
+                self.distractor_two_wid.size_hint = (.3, .3)
+                self.distractor_two_wid.pos = (
+                    (self.center_x - (0.15 * self.monitor_x_dim) + (0.25 * self.monitor_x_dim)),
+                    (self.center_y - (0.15 * self.monitor_y_dim)))
+
+                self.add_widget(self.distractor_one_wid)
+                self.add_widget(self.distractor_two_wid)
             self.add_widget(self.image_wid)
             self.image_pres_time = time.time()
             self.image_on_screen = True
@@ -177,6 +220,9 @@ class Experiment_Staging(FloatLayout):
             Clock.unschedule(self.image_presentation)
             self.feedback_string = ''
             self.remove_widget(self.image_wid)
+            if self.current_stage == 3 and self.distractor_active == 1:
+                self.remove_widget(self.distractor_one_wid)
+                self.remove_widget(self.distractor_two_wid)
             if (self.image_list[self.image_list_pos] == 'horizontal'):
                 self.current_correct = 0
             else:
@@ -190,6 +236,9 @@ class Experiment_Staging(FloatLayout):
     def image_pressed(self,*args):
         Clock.unschedule(self.image_presentation)
         self.remove_widget(self.image_wid)
+        if self.current_stage == 3 and self.distractor_active == 1:
+            self.remove_widget(self.distractor_one_wid)
+            self.remove_widget(self.distractor_two_wid)
         if self.image_list[self.image_list_pos] == 'horizontal':
             self.response_correct()
         else:
@@ -266,6 +315,36 @@ class Experiment_Staging(FloatLayout):
 
 
         self.current_trial += 1
+
+        if self.current_total_hits >= 100:
+            self.current_stage += 1
+            self.iti_time = 1
+            self.presentation_delay_time = 1
+            self.feedback_length = 1
+            self.stimulus_duration = 1
+            self.current_total_hits = 0
+        if self.current_stage == 2:
+            self.contrast_list_pos = random.randint(0, 3)
+            self.image_name_contrast = '%s%s' % (self.image_list[self.image_list_pos], self.contrast_list[self.contrast_list_pos])
+        if self.current_stage == 3:
+            self.distractor_active = random.randint(0,1)
+            self.distractor_congruent = random.randint(0,1)
+            if self.distractor_active == 1:
+                if self.distractor_congruent == 0:
+                    if self.image_list[self.image_list_pos] == 'horizontal':
+                        self.distractor_image_pos = random.randint(4,7)
+                    else:
+                        self.distractor_image_pos = 0
+                elif self.distractor_congruent == 1:
+                    self.distractor_image_pos = self.image_list_pos
+        if self.current_stage == 4:
+            self.stimulus_duration_pos = random.randint(0,3)
+            self.stimulus_duration = self.stimulus_duration_list[self.stimulus_duration_pos]
+        if self.current_stage == 5:
+            self.iti_duration_pos = random.randint(0,2)
+            self.iti_time = self.iti_duration_list[self.iti_duration_pos]
+
+
 
     def feedback_report(self,*args):
         self.feedback_displayed = True
