@@ -70,13 +70,12 @@ class Experiment_Staging(FloatLayout):
         while self.image_correct_selected == self.image_incorrect_selected:
             self.image_incorrect_selected = random.randint(0,2)
 
-        if self.image_incorrect_selected or self.image_correct_selected != 0:
+        if self.image_incorrect_selected != 0 and self.image_correct_selected != 0:
             self.image_incorrect_position = 0
-        elif self.image_incorrect_selected or self.image_correct_selected != 1:
+        elif self.image_incorrect_selected != 1 and self.image_correct_selected != 1:
             self.image_incorrect_position = 1
-        elif self.image_incorrect_selected or self.image_correct_selected != 2:
+        elif self.image_incorrect_selected != 2 and self.image_correct_selected != 2:
             self.image_incorrect_position = 2
-
 
 
 
@@ -89,6 +88,7 @@ class Experiment_Staging(FloatLayout):
         self.delay_hold_button = ImageButton(source='%s\\Images\\white.png' % (self.curr_dir), allow_stretch=True)
         self.delay_hold_button.size_hint = (.16,.16)
         self.delay_hold_button.pos = ((self.center_x - (0.08 * self.monitor_x_dim)),(self.center_y - (0.08 * self.monitor_y_dim) - (0.4 * self.monitor_y_dim)))
+
 
         Clock.schedule_interval(self.clock_update, 0.001)
         self.id_entry()
@@ -182,14 +182,14 @@ class Experiment_Staging(FloatLayout):
             self.correct_image_wid = ImageButton(source='%s\\Images\\%s.png' % (self.curr_dir,self.image_list[self.image_correct_selected]), allow_stretch=True)
             self.correct_image_wid.size_hint = (.3, .3)
             self.correct_image_wid.pos = (
-            (self.center_x - (0.15 * self.monitor_x_dim) + (0.1 * self.image_correct_pos[self.image_correct_selected] * self.monitor_x_dim)), (self.center_y - (0.15 * self.monitor_y_dim)))
+            (self.center_x - (0.15 * self.monitor_x_dim) + (0.3 * self.image_correct_pos[self.image_correct_selected] * self.monitor_x_dim)), (self.center_y - (0.15 * self.monitor_y_dim)))
             self.correct_image_wid.bind(on_press= self.response_correct)
             self.add_widget(self.correct_image_wid)
 
             self.incorrect_image_wid = ImageButton(source='%s\\Images\\%s.png' % (self.curr_dir,self.image_list[self.image_incorrect_selected]), allow_stretch=True)
             self.incorrect_image_wid.size_hint = (.3, .3)
             self.incorrect_image_wid.pos = (
-            (self.center_x - (0.15 * self.monitor_x_dim) + (0.1 * self.image_incorrect_position * self.monitor_x_dim)), (self.center_y - (0.15 * self.monitor_y_dim)))
+            (self.center_x - (0.15 * self.monitor_x_dim) + (0.3 * self.image_correct_pos[self.image_incorrect_position] * self.monitor_x_dim)), (self.center_y - (0.15 * self.monitor_y_dim)))
             self.incorrect_image_wid.bind(on_press= self.response_incorrect)
             self.add_widget(self.incorrect_image_wid)
 
@@ -210,6 +210,8 @@ class Experiment_Staging(FloatLayout):
 
         self.record_data()
         self.set_new_trial_configuration()
+        self.feedback_report()
+        self.delay_hold_button.bind(on_press=self.start_iti)
 
     def response_incorrect(self, *args):
         self.image_touch_time = time.time()
@@ -223,7 +225,8 @@ class Experiment_Staging(FloatLayout):
 
         self.current_correct = 0
         self.record_data()
-        self.start_iti()
+        self.feedback_report()
+        self.delay_hold_button.bind(on_press=self.start_iti)
 
     def premature_response(self,*args):
         if self.image_on_screen == True:
@@ -258,6 +261,7 @@ class Experiment_Staging(FloatLayout):
         self.current_correction = 0
         self.current_trial += 1
 
+
         self.image_correct_selected = random.randint(0,2)
 
         self.image_incorrect_selected = random.randint(0,2)
@@ -265,15 +269,13 @@ class Experiment_Staging(FloatLayout):
         while self.image_correct_selected == self.image_incorrect_selected:
             self.image_incorrect_selected = random.randint(0,2)
 
-        if self.image_incorrect_selected or self.image_correct_selected != 0:
+        if self.image_incorrect_selected != 0 and self.image_correct_selected != 0:
             self.image_incorrect_position = 0
-        elif self.image_incorrect_selected or self.image_correct_selected != 1:
+        elif self.image_incorrect_selected != 1 and self.image_correct_selected != 1:
             self.image_incorrect_position = 1
-        elif self.image_incorrect_selected or self.image_correct_selected != 2:
+        elif self.image_incorrect_selected != 2 and self.image_correct_selected != 2:
             self.image_incorrect_position = 2
 
-
-        self.start_iti()
 
 
 
@@ -284,11 +286,11 @@ class Experiment_Staging(FloatLayout):
         self.feedback_wid.size_hint = (.5,.3)
         self.feedback_wid.pos = ((self.center_x - (0.25 * self.monitor_x_dim)),(self.center_y - (0.15*self.monitor_y_dim)))
         self.add_widget(self.feedback_wid)
+        self.start_feedback_time = time.time()
 
     def start_iti(self,*args):
         self.delay_hold_button.unbind(on_press=self.start_iti)
         self.delay_hold_button.bind(on_release=self.premature_response)
-        self.start_feedback_time = time.time()
         self.iti_clock_trigger = False
         self.image_on_screen = False
         self.end_iti()
