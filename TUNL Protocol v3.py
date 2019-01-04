@@ -37,11 +37,12 @@ class Experiment_Staging(FloatLayout):
         if not os.path.exists(self.data_dir):
             os.makedirs(self.data_dir)
 
-        self.current_stage = 1
-        self.next_stage = 1
-        self.stage_executed = False
 
         self.delay_length = 4
+
+        self.current_stage = 2
+        self.stage_criteria = 48
+        self.current_total_correct = 0
 
         self.max_trials = 72
         self.max_time = 3600
@@ -54,7 +55,7 @@ class Experiment_Staging(FloatLayout):
 
 
         self.sample_x_shift = random.randint(-3,4)
-        self.sample_y_shift = random.randint(-4,4)
+        self.sample_y_shift = random.randint(-3,4)
 
 
         self.choice_x_shift = random.randint(-3,4)
@@ -64,6 +65,17 @@ class Experiment_Staging(FloatLayout):
             while (self.choice_x_shift == self.sample_x_shift) or (self.choice_y_shift == self.sample_y_shift):
                 self.choice_x_shift = random.randint(-3, 4)
                 self.choice_y_shift = random.randint(-3, 4)
+
+        self.interfere_x_shift = random.randint(-3,4)
+        self.interfere_y_shift = random.randint(-3,4)
+
+        while ((self.interfere_x_shift == self.sample_x_shift) and (self.interfere_y_shift == self.sample_y_shift)) or ((self.interfere_x_shift == self.choice_x_shift) and (self.interfere_y_shift == self.choice_y_shift)):
+            self.interfere_x_shift = random.randint(-3, 4)
+            self.interfere_y_shift = random.randint(-3, 4)
+
+        self.interference_presentation_length = 0.5
+        self.interference_start_time = 0
+        self.interference_active = False
 
 
         self.lat = 0
@@ -195,6 +207,26 @@ class Experiment_Staging(FloatLayout):
         if self.delay_clock_start == False:
             Clock.schedule_interval(self.sample_delay_end, 0.01)
             self.delay_clock_start = True
+        if (self.delay_clock_start == True) and (self.current_stage == 2) and (self.interference_active == False) and ((self.current_time - self.delay_start) < (self.iti_time - self.interference_presentation_length)):
+            self.intereference_image_wid = ImageButton(source='%s\\Images\\yellow.png' % (self.curr_dir),
+                                                    allow_stretch=True)
+            self.intereference_image_wid.size_hint = (.08, .08)
+            self.intereference_image_wid.pos = (
+            (self.center_x - (0.05 * self.monitor_x_dim) + ((self.interfere_x_shift * 0.1) * self.monitor_y_dim)),
+            (self.center_y - (0.05 * self.monitor_y_dim) + ((self.interfere_y_shift * 0.1) * self.monitor_y_dim)))
+            self.add_widget(self.intereference_image_wid)
+            self.interference_start_time = time.time()
+            self.interference_active = True
+
+        if ((self.current_time - self.interference_start_time) >= self.interference_presentation_length) and (self.interference_active == True):
+            self.remove_widget(self.intereference_image_wid)
+            self.interfere_x_shift = random.randint(-3,4)
+            self.interfere_y_shift = random.randint(-3,4)
+
+            while ((self.interfere_x_shift == self.sample_x_shift) and (self.interfere_y_shift == self.sample_y_shift)) or ((self.interfere_x_shift == self.choice_x_shift) and (self.interfere_y_shift == self.choice_y_shift)):
+                self.interfere_x_shift = random.randint(-3, 4)
+                self.interfere_y_shift = random.randint(-3, 4)
+            self.interference_active = False
         if (self.current_time - self.delay_start) >= self.iti_time:
             Clock.unschedule(self.sample_delay_end)
             self.initiation_image_wid = ImageButton(source='%s\\Images\\white.png' % (self.curr_dir),
@@ -234,6 +266,7 @@ class Experiment_Staging(FloatLayout):
 
 
         self.current_correct = 1
+        self.current_total_correct += 1
         self.correction_active = False
         self.feedback_string = 'CORRECT'
 
@@ -284,6 +317,18 @@ class Experiment_Staging(FloatLayout):
                 while (self.choice_x_shift == self.sample_x_shift) and (self.choice_y_shift == self.sample_y_shift):
                     self.choice_x_shift = random.randint(-3, 4)
                     self.choice_y_shift = random.randint(-3, 4)
+
+        if self.current_total_correct >= self.stage_criteria:
+            self.current_total_correct = 0
+            self.current_stage += 1
+
+        if self.current_stage == 2:
+            self.interfere_x_shift = random.randint(-3,4)
+            self.interfere_y_shift = random.randint(-3,4)
+
+            while ((self.interfere_x_shift == self.sample_x_shift) and (self.interfere_y_shift == self.sample_y_shift)) or ((self.interfere_x_shift == self.choice_x_shift) and (self.interfere_y_shift == self.choice_y_shift)):
+                self.interfere_x_shift = random.randint(-3, 4)
+                self.interfere_y_shift = random.randint(-3, 4)
 
         self.current_trial += 1
         self.start_iti()
