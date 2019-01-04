@@ -52,15 +52,16 @@ class Experiment_Staging(FloatLayout):
 
         self.current_trial = 1
         self.current_total_hits = 0
+        self.hit_threshold = 5
         self.current_stage = 1
         self.time_elapsed = 0
         self.start_time = time.time()
         self.start_iti_time = 0
 
-        self.iti_time = 1
+        self.iti_time = 0.5
         self.presentation_delay_time = 1
-        self.feedback_length = 1
-        self.stimulus_duration = 1
+        self.feedback_length = 0.5
+        self.stimulus_duration = 0.5
 
         self.image_list = ['horizontal','horizontal','horizontal','horizontal','vertical','left','right','rings']
         self.image_list_pos = random.randint(0,7)
@@ -316,13 +317,10 @@ class Experiment_Staging(FloatLayout):
 
         self.current_trial += 1
 
-        if self.current_total_hits >= 100:
-            self.current_stage += 1
-            self.iti_time = 1
-            self.presentation_delay_time = 1
-            self.feedback_length = 1
-            self.stimulus_duration = 1
-            self.current_total_hits = 0
+        if self.current_total_hits >= self.hit_threshold:
+            self.remove_widget(self.delay_hold_button)
+            self.block_hold()
+            return
         if self.current_stage == 2:
             self.contrast_list_pos = random.randint(0, 3)
             self.image_name_contrast = '%s%s' % (self.image_list[self.image_list_pos], self.contrast_list[self.contrast_list_pos])
@@ -345,6 +343,33 @@ class Experiment_Staging(FloatLayout):
             self.iti_time = self.iti_duration_list[self.iti_duration_pos]
 
 
+    def block_hold(self,*args):
+        self.current_stage += 1
+        self.iti_time = 0.5
+        self.presentation_delay_time = 0.5
+        self.feedback_length = 0.5
+        self.stimulus_duration = 0.5
+        self.current_total_hits = 0
+        self.current_trial -= 1
+
+        self.block_instruction_wid = Label(text='PRESS BUTTON TO CONTINUE WHEN READY',font_size='50sp')
+        self.block_instruction_wid.size_hint = (.5,.3)
+        self.block_instruction_wid.pos = ((self.center_x - (0.25 * self.monitor_x_dim)),(self.center_y - (0.15*self.monitor_y_dim) + (0.3*self.monitor_y_dim)))
+
+        self.block_button = Button(text='Continue')
+        self.block_button.size_hint = (.2,.1)
+        self.block_button.pos = ((self.center_x - (0.1 * self.monitor_x_dim)),(self.center_y - (0.05*self.monitor_y_dim) + (-0.4*self.monitor_y_dim)))
+        self.block_button.bind(on_press = self.block_press)
+
+        self.add_widget(self.block_instruction_wid)
+        self.add_widget(self.block_button)
+
+    def block_press(self,*args):
+        self.remove_widget(self.block_instruction_wid)
+        self.remove_widget(self.block_button)
+        self.set_new_trial_configuration()
+        self.add_widget(self.delay_hold_button)
+
 
     def feedback_report(self,*args):
         self.feedback_displayed = True
@@ -352,7 +377,8 @@ class Experiment_Staging(FloatLayout):
         self.feedback_wid = Label(text=self.feedback_string, font_size='50sp')
         self.feedback_wid.size_hint = (.5,.3)
         self.feedback_wid.pos = ((self.center_x - (0.25 * self.monitor_x_dim)),(self.center_y - (0.15*self.monitor_y_dim)))
-        self.add_widget(self.feedback_wid)
+        if self.current_total_hits < self.hit_threshold:
+            self.add_widget(self.feedback_wid)
 
     def start_iti(self,*args):
         self.delay_hold_button.unbind(on_press=self.start_iti)
