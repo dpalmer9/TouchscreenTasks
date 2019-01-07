@@ -40,7 +40,7 @@ class Experiment_Staging(FloatLayout):
 
         self.delay_length = 4
 
-        self.current_stage = 2
+        self.current_stage = 3
         self.stage_criteria = 48
         self.current_total_correct = 0
 
@@ -76,7 +76,73 @@ class Experiment_Staging(FloatLayout):
         self.interference_presentation_length = 0.5
         self.interference_start_time = 0
         self.interference_active = False
+        
+        self.interfere_press = 0
 
+        self.sample_coord = (self.sample_x_shift, self.sample_y_shift)
+        self.choice_coord = (self.choice_x_shift, self.choice_y_shift)
+
+        self.interfere_x_shift_1 = random.randint(-3, 4)
+        self.interfere_y_shift_1 = random.randint(-3, 4)
+        self.interfere_shift_1_coord = (self.interfere_x_shift_1, self.interfere_y_shift_1)
+
+        self.interfere_x_shift_2 = random.randint(-3, 4)
+        self.interfere_y_shift_2 = random.randint(-3, 4)
+        self.interfere_shift_2_coord = (self.interfere_x_shift_2, self.interfere_y_shift_2)
+
+        self.interfere_x_shift_3 = random.randint(-3, 4)
+        self.interfere_y_shift_3 = random.randint(-3, 4)
+        self.interfere_shift_3_coord = (self.interfere_x_shift_3, self.interfere_y_shift_3)
+
+        self.distractor_x_shift_1 = random.randint(-3, 4)
+        self.distractor_y_shift_1 = random.randint(-3, 4)
+        self.distractor_shift_1_coord = (self.distractor_x_shift_1, self.distractor_y_shift_1)
+
+        self.distractor_x_shift_2 = random.randint(-3, 4)
+        self.distractor_y_shift_2 = random.randint(-3, 4)
+        self.distractor_shift_2_coord = (self.distractor_x_shift_2, self.distractor_y_shift_2)
+
+        self.distractor_x_shift_3 = random.randint(-3, 4)
+        self.distractor_y_shift_3 = random.randint(-3, 4)
+        self.distractor_shift_3_coord = (self.distractor_x_shift_3, self.distractor_y_shift_3)
+
+        self.coordinate_list = [self.sample_coord, self.choice_coord, self.interfere_shift_1_coord,
+                                self.interfere_shift_2_coord,
+                                self.interfere_shift_3_coord, self.distractor_shift_1_coord,
+                                self.distractor_shift_2_coord,
+                                self.distractor_shift_3_coord]
+
+        self.work_list = self.coordinate_list
+
+        for pos in range(2, 7):
+            self.check_list = [0, 1, 2, 3, 4, 5, 6, 7]
+            self.check_list.remove(pos)
+            for check in self.check_list:
+                if self.coordinate_list[pos] == self.coordinate_list[check]:
+                    if pos == 2:
+                        self.interfere_x_shift_1 = random.randint(-3, 4)
+                        self.interfere_y_shift_1 = random.randint(-3, 4)
+                        self.interfere_shift_1_coord = (self.interfere_x_shift_1, self.interfere_y_shift_1)
+                    if pos == 3:
+                        self.interfere_x_shift_2 = random.randint(-3, 4)
+                        self.interfere_y_shift_2 = random.randint(-3, 4)
+                        self.interfere_shift_2_coord = (self.interfere_x_shift_2, self.interfere_y_shift_2)
+                    if pos == 4:
+                        self.interfere_x_shift_3 = random.randint(-3, 4)
+                        self.interfere_y_shift_3 = random.randint(-3, 4)
+                        self.interfere_shift_3_coord = (self.interfere_x_shift_3, self.interfere_y_shift_3)
+                    if pos == 5:
+                        self.distractor_x_shift_1 = random.randint(-3, 4)
+                        self.distractor_y_shift_1 = random.randint(-3, 4)
+                        self.distractor_shift_1_coord = (self.distractor_x_shift_1, self.distractor_y_shift_1)
+                    if pos == 6:
+                        self.distractor_x_shift_2 = random.randint(-3, 4)
+                        self.distractor_y_shift_2 = random.randint(-3, 4)
+                        self.distractor_shift_2_coord = (self.distractor_x_shift_2, self.distractor_y_shift_2)
+                    if pos == 7:
+                        self.distractor_x_shift_3 = random.randint(-3, 4)
+                        self.distractor_y_shift_3 = random.randint(-3, 4)
+                        self.distractor_shift_3_coord = (self.distractor_x_shift_3, self.distractor_y_shift_3)
 
         self.lat = 0
         self.init_lat = 0
@@ -201,12 +267,14 @@ class Experiment_Staging(FloatLayout):
         self.remove_widget(self.sample_image_wid)
         self.delay_start = time.time()
         self.delay_clock_start = False
+        self.interference_active = False
         self.sample_delay_end()
 
     def sample_delay_end(self,*args):
         if self.delay_clock_start == False:
             Clock.schedule_interval(self.sample_delay_end, 0.01)
             self.delay_clock_start = True
+            print('%s %s %s' % (self.delay_clock_start, self.current_stage, self.interference_active))
         if (self.delay_clock_start == True) and (self.current_stage == 2) and (self.interference_active == False) and ((self.current_time - self.delay_start) < (self.iti_time - self.interference_presentation_length)):
             self.intereference_image_wid = ImageButton(source='%s\\Images\\yellow.png' % (self.curr_dir),
                                                     allow_stretch=True)
@@ -217,8 +285,64 @@ class Experiment_Staging(FloatLayout):
             self.add_widget(self.intereference_image_wid)
             self.interference_start_time = time.time()
             self.interference_active = True
+            
+        if (self.delay_clock_start == True) and (self.current_stage == 3) and (self.interference_active == False):
+            self.intereference_image_wid_1 = ImageButton(source='%s\\Images\\yellow.png' % (self.curr_dir),
+                                                    allow_stretch=True)
+            self.intereference_image_wid_1.size_hint = (.08, .08)
+            self.intereference_image_wid_1.pos = (
+            (self.center_x - (0.05 * self.monitor_x_dim) + ((self.interfere_x_shift_1 * 0.1) * self.monitor_y_dim)),
+            (self.center_y - (0.05 * self.monitor_y_dim) + ((self.interfere_y_shift_1 * 0.1) * self.monitor_y_dim)))
+            self.intereference_image_wid_1.bind(on_press = self.interefere_1_press)
+            
+            self.intereference_image_wid_2 = ImageButton(source='%s\\Images\\yellow.png' % (self.curr_dir),
+                                                    allow_stretch=True)
+            self.intereference_image_wid_2.size_hint = (.08, .08)
+            self.intereference_image_wid_2.pos = (
+            (self.center_x - (0.05 * self.monitor_x_dim) + ((self.interfere_x_shift_2 * 0.1) * self.monitor_y_dim)),
+            (self.center_y - (0.05 * self.monitor_y_dim) + ((self.interfere_y_shift_2 * 0.1) * self.monitor_y_dim)))
+            self.intereference_image_wid_2.bind(on_press=self.interefere_2_press)
+            
+            self.intereference_image_wid_3 = ImageButton(source='%s\\Images\\yellow.png' % (self.curr_dir),
+                                                    allow_stretch=True)
+            self.intereference_image_wid_3.size_hint = (.08, .08)
+            self.intereference_image_wid_3.pos = (
+            (self.center_x - (0.05 * self.monitor_x_dim) + ((self.interfere_x_shift_3 * 0.1) * self.monitor_y_dim)),
+            (self.center_y - (0.05 * self.monitor_y_dim) + ((self.interfere_y_shift_3 * 0.1) * self.monitor_y_dim)))
+            self.intereference_image_wid_3.bind(on_press=self.interefere_3_press)
 
-        if ((self.current_time - self.interference_start_time) >= self.interference_presentation_length) and (self.interference_active == True):
+            self.distractor_image_wid_1 = ImageButton(source='%s\\Images\\red.png' % (self.curr_dir),
+                                                         allow_stretch=True)
+            self.distractor_image_wid_1.size_hint = (.08, .08)
+            self.distractor_image_wid_1.pos = (
+                (self.center_x - (0.05 * self.monitor_x_dim) + ((self.distractor_x_shift_1 * 0.1) * self.monitor_y_dim)),
+                (self.center_y - (0.05 * self.monitor_y_dim) + ((self.distractor_y_shift_1 * 0.1) * self.monitor_y_dim)))
+
+            self.distractor_image_wid_2 = ImageButton(source='%s\\Images\\red.png' % (self.curr_dir),
+                                                         allow_stretch=True)
+            self.distractor_image_wid_2.size_hint = (.08, .08)
+            self.distractor_image_wid_2.pos = (
+                (self.center_x - (0.05 * self.monitor_x_dim) + ((self.distractor_x_shift_2 * 0.1) * self.monitor_y_dim)),
+                (self.center_y - (0.05 * self.monitor_y_dim) + ((self.distractor_y_shift_2 * 0.1) * self.monitor_y_dim)))
+
+            self.distractor_image_wid_3 = ImageButton(source='%s\\Images\\red.png' % (self.curr_dir),
+                                                         allow_stretch=True)
+            self.distractor_image_wid_3.size_hint = (.08, .08)
+            self.distractor_image_wid_3.pos = (
+                (self.center_x - (0.05 * self.monitor_x_dim) + ((self.distractor_x_shift_3 * 0.1) * self.monitor_y_dim)),
+                (self.center_y - (0.05 * self.monitor_y_dim) + ((self.distractor_y_shift_3 * 0.1) * self.monitor_y_dim)))
+            
+            self.add_widget(self.intereference_image_wid_1)
+            self.add_widget(self.intereference_image_wid_2)
+            self.add_widget(self.intereference_image_wid_3)
+
+            self.add_widget(self.distractor_image_wid_1)
+            self.add_widget(self.distractor_image_wid_2)
+            self.add_widget(self.distractor_image_wid_3)
+            self.interference_start_time = time.time()
+            self.interference_active = True
+
+        if ((self.current_time - self.interference_start_time) >= self.interference_presentation_length) and (self.interference_active == True) and (self.current_stage == 2):
             self.remove_widget(self.intereference_image_wid)
             self.interfere_x_shift = random.randint(-3,4)
             self.interfere_y_shift = random.randint(-3,4)
@@ -227,7 +351,7 @@ class Experiment_Staging(FloatLayout):
                 self.interfere_x_shift = random.randint(-3, 4)
                 self.interfere_y_shift = random.randint(-3, 4)
             self.interference_active = False
-        if (self.current_time - self.delay_start) >= self.iti_time:
+        if ((self.current_time - self.delay_start) >= self.iti_time) and (self.current_stage != 3):
             Clock.unschedule(self.sample_delay_end)
             self.initiation_image_wid = ImageButton(source='%s\\Images\\white.png' % (self.curr_dir),
                                                     allow_stretch=True)
@@ -236,6 +360,40 @@ class Experiment_Staging(FloatLayout):
                         self.center_y - (0.05 * self.monitor_y_dim) - (0.45 * self.monitor_y_dim)))
             self.initiation_image_wid.bind(on_press= self.choice_presentation)
             self.add_widget(self.initiation_image_wid)
+        if (self.current_stage == 3) and (self.interfere_press >= 3):
+            Clock.unschedule(self.sample_delay_end)
+            self.interfere_press = 0
+            self.interference_active == False
+            
+            self.remove_widget(self.intereference_image_wid_1)
+            self.remove_widget(self.intereference_image_wid_2)
+            self.remove_widget(self.intereference_image_wid_3)
+
+            self.remove_widget(self.distractor_image_wid_1)
+            self.remove_widget(self.distractor_image_wid_2)
+            self.remove_widget(self.distractor_image_wid_3)
+            
+            self.initiation_image_wid = ImageButton(source='%s\\Images\\white.png' % (self.curr_dir),
+                                                    allow_stretch=True)
+            self.initiation_image_wid.size_hint = (.2, .1)
+            self.initiation_image_wid.pos = ((self.center_x - (0.1 * self.monitor_x_dim)), (
+                        self.center_y - (0.05 * self.monitor_y_dim) - (0.45 * self.monitor_y_dim)))
+            self.initiation_image_wid.bind(on_press= self.choice_presentation)
+            self.add_widget(self.initiation_image_wid)
+    def interefere_1_press(self,*args):
+        self.intereference_image_wid_1.source ='%s\\Images\\grey.png' % (self.curr_dir)
+        self.interfere_press += 1
+        self.intereference_image_wid_1.unbind(on_press = self.interefere_1_press)
+
+    def interefere_2_press(self, *args):
+        self.intereference_image_wid_2.source ='%s\\Images\\grey.png' % (self.curr_dir)
+        self.interfere_press += 1
+        self.intereference_image_wid_2.unbind(on_press=self.interefere_2_press)
+
+    def interefere_3_press(self, *args):
+        self.intereference_image_wid_3.source ='%s\\Images\\grey.png' % (self.curr_dir)
+        self.interfere_press += 1
+        self.intereference_image_wid_3.unbind(on_press=self.interefere_3_press)
 
     def choice_presentation(self,*args):
         self.delay_end = time.time()
@@ -318,6 +476,9 @@ class Experiment_Staging(FloatLayout):
                     self.choice_x_shift = random.randint(-3, 4)
                     self.choice_y_shift = random.randint(-3, 4)
 
+        self.sample_coord = (self.sample_x_shift, self.sample_y_shift)
+        self.choice_coord = (self.choice_x_shift, self.choice_y_shift)
+
         if self.current_total_correct >= self.stage_criteria:
             self.current_total_correct = 0
             self.current_stage += 1
@@ -329,6 +490,70 @@ class Experiment_Staging(FloatLayout):
             while ((self.interfere_x_shift == self.sample_x_shift) and (self.interfere_y_shift == self.sample_y_shift)) or ((self.interfere_x_shift == self.choice_x_shift) and (self.interfere_y_shift == self.choice_y_shift)):
                 self.interfere_x_shift = random.randint(-3, 4)
                 self.interfere_y_shift = random.randint(-3, 4)
+
+        if self.current_stage == 3:
+            self.interfere_x_shift_1 = random.randint(-3,4)
+            self.interfere_y_shift_1 = random.randint(-3,4)
+            self.interfere_shift_1_coord = (self.interfere_x_shift_1,self.interfere_y_shift_1)
+
+            self.interfere_x_shift_2 = random.randint(-3,4)
+            self.interfere_y_shift_2 = random.randint(-3,4)
+            self.interfere_shift_2_coord = (self.interfere_x_shift_2,self.interfere_y_shift_2)
+
+            self.interfere_x_shift_3 = random.randint(-3,4)
+            self.interfere_y_shift_3 = random.randint(-3,4)
+            self.interfere_shift_3_coord = (self.interfere_x_shift_3,self.interfere_y_shift_3)
+            
+            self.distractor_x_shift_1 = random.randint(-3,4)
+            self.distractor_y_shift_1 = random.randint(-3,4)
+            self.distractor_shift_1_coord = (self.distractor_x_shift_1,self.distractor_y_shift_1)
+
+            self.distractor_x_shift_2 = random.randint(-3,4)
+            self.distractor_y_shift_2 = random.randint(-3,4)
+            self.distractor_shift_2_coord = (self.distractor_x_shift_2,self.distractor_y_shift_2)
+
+            self.distractor_x_shift_3 = random.randint(-3,4)
+            self.distractor_y_shift_3 = random.randint(-3,4)
+            self.distractor_shift_3_coord = (self.distractor_x_shift_3,self.distractor_y_shift_3)
+
+            self.coordinate_list = [self.sample_coord, self.choice_coord, self.interfere_shift_1_coord,self.interfere_shift_2_coord,
+                                    self.interfere_shift_3_coord,self.distractor_shift_1_coord,self.distractor_shift_2_coord,
+                                    self.distractor_shift_3_coord]
+
+            self.work_list = self.coordinate_list
+
+            for pos in range(2,7):
+                self.check_list = [0,1,2,3,4,5,6,7]
+                self.check_list.remove(pos)
+                for check in self.check_list:
+                    if self.coordinate_list[pos] == self.coordinate_list[check]:
+                        if pos == 2:
+                            self.interfere_x_shift_1 = random.randint(-3, 4)
+                            self.interfere_y_shift_1 = random.randint(-3, 4)
+                            self.interfere_shift_1_coord = (self.interfere_x_shift_1, self.interfere_y_shift_1)
+                        if pos == 3:
+                            self.interfere_x_shift_2 = random.randint(-3, 4)
+                            self.interfere_y_shift_2 = random.randint(-3, 4)
+                            self.interfere_shift_2_coord = (self.interfere_x_shift_2, self.interfere_y_shift_2)
+                        if pos == 4:
+                            self.interfere_x_shift_3 = random.randint(-3, 4)
+                            self.interfere_y_shift_3 = random.randint(-3, 4)
+                            self.interfere_shift_3_coord = (self.interfere_x_shift_3, self.interfere_y_shift_3)
+                        if pos == 5:
+                            self.distractor_x_shift_1 = random.randint(-3, 4)
+                            self.distractor_y_shift_1 = random.randint(-3, 4)
+                            self.distractor_shift_1_coord = (self.distractor_x_shift_1, self.distractor_y_shift_1)
+                        if pos == 6:
+                            self.distractor_x_shift_2 = random.randint(-3, 4)
+                            self.distractor_y_shift_2 = random.randint(-3, 4)
+                            self.distractor_shift_2_coord = (self.distractor_x_shift_2, self.distractor_y_shift_2)
+                        if pos == 7:
+                            self.distractor_x_shift_3 = random.randint(-3, 4)
+                            self.distractor_y_shift_3 = random.randint(-3, 4)
+                            self.distractor_shift_3_coord = (self.distractor_x_shift_3, self.distractor_y_shift_3)
+
+
+
 
         self.current_trial += 1
         self.start_iti()
