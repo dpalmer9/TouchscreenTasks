@@ -34,20 +34,26 @@ class Experiment_Configuration():
         self.trial_max_input = tk.Entry(self.main_run)
         self.trial_max_input.grid(row=1,column=2)
 
+        self.trial_max_reversal_label = tk.Label(self.main_run,text='Maximum Reversals:')
+        self.trial_max_reversal_label.grid(row=2,column=0)
+
+        self.trial_max_reversal_input = tk.Entry(self.main_run)
+        self.trial_max_reversal_input.grid(row=2,column=2)
+
         self.session_max_label = tk.Label(self.main_run,text='Maximum Session Length:')
-        self.session_max_label.grid(row=2,column=0)
+        self.session_max_label.grid(row=3,column=0)
 
         self.session_max_input = tk.Entry(self.main_run)
-        self.session_max_input.grid(row=2,column=3)
+        self.session_max_input.grid(row=3,column=3)
 
         self.id_entry_label = tk.Label(self.main_run, text='Subject ID:')
-        self.id_entry_label.grid(row=3,column=0)
+        self.id_entry_label.grid(row=4,column=0)
 
         self.id_entry_input = tk.Entry(self.main_run)
-        self.id_entry_input.grid(row=3,column=3)
+        self.id_entry_input.grid(row=4,column=3)
 
         self.execute_button = tk.Button(self.main_run,text='Execute',command=self.start_protocol)
-        self.execute_button.grid(row=4,column=1)
+        self.execute_button.grid(row=5,column=1)
 
     def start_protocol(self):
         self.trial_max = float(self.trial_max_input.get())
@@ -69,7 +75,7 @@ class ImageButton(ButtonBehavior,Image):
         super(ImageButton,self).__init__(**kwargs)
 
 class Experiment_Staging(FloatLayout):
-    def __init__(self,**kwargs):
+    def __init__(self,trial_max,session_max,id_entry,max_reversal,**kwargs):
         super(Experiment_Staging,self).__init__(**kwargs)
         self.monitor_x_dim = GetSystemMetrics(0)
         self.monitor_y_dim = GetSystemMetrics(1)
@@ -91,8 +97,10 @@ class Experiment_Staging(FloatLayout):
 
         self.delay_length = 4
 
-        self.max_trials = 72
-        self.max_time = 3600
+        self.max_trials = trial_max
+        self.max_time = session_max
+        self.id_no = id_entry
+        self.max_reversal = max_reversal
 
         self.current_trial = 1
         self.current_stage = 1
@@ -152,9 +160,19 @@ class Experiment_Staging(FloatLayout):
 
 
         Clock.schedule_interval(self.clock_update, 0.001)
-        self.id_entry()
+        self.id_setup()
 
+    def id_setup(self):
+        self.participant_data_folder = self.data_dir + '\\' + self.id_no + '\\'
+        if os.path.exists(self.participant_data_folder) == False:
+            os.makedirs(self.participant_data_folder)
+        self.participant_data_path = self.participant_data_folder + 'vPRL %s.csv' % (self.id_no)
+        self.data_col_names = 'TrialNo, Trial Type, Correction Trial, Correct, Response Latency'
+        self.data_file = open(self.participant_data_path, "w+")
+        self.data_file.write(self.data_col_names)
+        self.data_file.close()
 
+        self.instruction_presentation()
 
     def id_entry(self):
         self.id_instruction = Label(text = 'Please enter a participant ID #:')
@@ -406,12 +424,10 @@ class Experiment_Staging(FloatLayout):
 
 class Experiment_App(App):
     def build(self):
-        experiment = Experiment_Staging()
+        experiment = Experiment_Staging(trial_max=self.trial_maximum,session_max=self.session_maximum,id_entry=self.id_value,max_reversal=self.maximum_reversal)
         return experiment
-
-if __name__ == '__main__':
-    monitor_x_dim = GetSystemMetrics(0)
-    monitor_y_dim = GetSystemMetrics(1)
-    Window.size = (monitor_x_dim,monitor_y_dim)
-    Window.fullscreen = True
-    Experiment_App().run()
+    def set(self,trial_max,session_max,id_entry,max_reversal):
+        self.trial_maximum = trial_max
+        self.session_maximum = session_max
+        self.id_value = id_entry
+        self.maximum_reversal = max_reversal
