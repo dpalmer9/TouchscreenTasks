@@ -8,7 +8,7 @@ from kivy.uix.button import Button
 from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.floatlayout import FloatLayout
-from win32api import GetSystemMetrics
+#from win32api import GetSystemMetrics
 from kivy.core.window import Window
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.clock import Clock
@@ -18,57 +18,13 @@ from functools import partial
 import random
 import os
 import time
-import tkinter as tk
-
-
-class Experiment_Configuration():
-    def __init__(self):
-        self.main_run = tk.Tk()
-
-        self.title = tk.Label(self.main_run,text='iCPT Protocol Setup')
-        self.title.grid(row=0,column=1)
-
-        self.trial_max_label = tk.Label(self.main_run,text='Maximum Trials:')
-        self.trial_max_label.grid(row=1,column=0)
-
-        self.trial_max_input = tk.Entry(self.main_run)
-        self.trial_max_input.grid(row=1,column=2)
-
-        self.session_max_label = tk.Label(self.main_run,text='Maximum Session Length:')
-        self.session_max_label.grid(row=2,column=0)
-
-        self.session_max_input = tk.Entry(self.main_run)
-        self.session_max_input.grid(row=2,column=3)
-
-        self.id_entry_label = tk.Label(self.main_run, text='Subject ID:')
-        self.id_entry_label.grid(row=3,column=0)
-
-        self.id_entry_input = tk.Entry(self.main_run)
-        self.id_entry_input.grid(row=3,column=3)
-
-        self.execute_button = tk.Button(self.main_run,text='Execute',command=self.start_protocol)
-        self.execute_button.grid(row=4,column=1)
-
-    def start_protocol(self):
-        self.trial_max = float(self.trial_max_input.get())
-        self.session_max = float(self.session_max_input.get())
-        self.id_entry = self.id_entry_input.get()
-        self.main_run.destroy()
-        self.monitor_x_dim = GetSystemMetrics(0)
-        self.monitor_y_dim = GetSystemMetrics(1)
-        Window.size = (self.monitor_x_dim, self.monitor_y_dim)
-        Window.fullscreen = True
-        self.main_app = Experiment_App()
-        self.main_app.set(trial_max=self.trial_max,session_max = self.session_max, id_entry = self.id_entry)
-        self.main_app.run()
-
 
 class ImageButton(ButtonBehavior,Image):
     def __init__(self,**kwargs):
         super(ImageButton,self).__init__(**kwargs)
 
 class Experiment_Staging(FloatLayout):
-    def __init__(self,**kwargs):
+    def __init__(self,trial_max,session_max,block_length,block_count,id_entry,**kwargs):
         super(Experiment_Staging,self).__init__(**kwargs)
         self.monitor_x_dim = GetSystemMetrics(0)
         self.monitor_y_dim = GetSystemMetrics(1)
@@ -87,8 +43,13 @@ class Experiment_Staging(FloatLayout):
         self.stage_criteria = 48
         self.current_total_correct = 0
 
-        self.max_trials = 72
-        self.max_time = 3600
+        self.max_trials = trial_max
+        self.max_time = session_max
+        
+        self.block_length = block_length
+        self.block_threshold = self.block_length
+        self.block_count = block_count
+        self.threshold_increment = self.block_length
 
         self.current_trial = 1
         self.time_elapsed = 0
@@ -197,38 +158,16 @@ class Experiment_Staging(FloatLayout):
         self.id_entry()
 
 
-    def id_entry(self):
-        self.id_instruction = Label(text = 'Please enter a participant ID #:')
-        self.id_instruction.size_hint = (.5,.2)
-        self.id_instruction.pos = ((self.center_x - (0.25 * self.monitor_x_dim)),(self.center_y - (0.1*self.monitor_y_dim) + (0.3*self.monitor_y_dim)))
-
-        self.id_entry = TextInput(text='', multiline=False)
-        self.id_entry.size_hint = (.3,.1)
-        self.id_entry.pos = ((self.center_x - (0.15 * self.monitor_x_dim)),(self.center_y - (0.05*self.monitor_y_dim) + (-0.3*self.monitor_y_dim)))
-
-
-        self.id_button = Button(text='OK')
-        self.id_button.size_hint = (.1,.1)
-        self.id_button.pos = ((self.center_x - (0.05 * self.monitor_x_dim)),(self.center_y - (0.05*self.monitor_y_dim) + (-0.4*self.monitor_y_dim)))
-        self.id_button.bind(on_press = self.clear_id)
-
-        self.add_widget(self.id_instruction)
-        self.add_widget(self.id_entry)
-        self.add_widget(self.id_button)
-
-    def clear_id(self,*args):
-        self.id_no = self.id_entry.text
-        self.id_entry.hide_keyboard()
-
-        self.participant_data_path = self.data_dir + '\\%s.csv' % (self.id_no)
-        self.data_col_names = 'TrialNo, Trial Type, Correction Trial, Correct, Response Latency, Initiation Latency'
+    def id_setup(self):
+        self.participant_data_folder = self.data_dir + '\\' + self.id_no + '\\'
+        if os.path.exists(self.participant_data_folder) == False:
+            os.makedirs(self.participant_data_folder)
+        self.participant_data_path = self.participant_data_folder + 'TUNL %s.csv' % (self.id_no)
+        self.data_col_names = 'TrialNo, Current Block, Trial Type, Correction Trial, Correct, Response Latency'
         self.data_file = open(self.participant_data_path, "w+")
         self.data_file.write(self.data_col_names)
         self.data_file.close()
 
-        self.remove_widget(self.id_instruction)
-        self.remove_widget(self.id_entry)
-        self.remove_widget(self.id_button)
         self.instruction_presentation()
 
     def instruction_presentation(self):
@@ -494,7 +433,7 @@ class Experiment_Staging(FloatLayout):
     def record_data(self):
         self.data_file = open(self.participant_data_path, "a")
         self.data_file.write("\n")
-        self.data_file.write("%s,[%s][%s]/[%s][%s],%s,%s,%s,%s" % (self.current_trial,self.sample_x_shift,self.sample_y_shift,self.choice_x_shift,self.choice_y_shift,self.current_correction,self.current_correct,self.lat,self.init_lat))
+        self.data_file.write("%s,%s,[%s][%s]/[%s][%s],%s,%s,%s,%s" % (self.current_trial,self.current_block,self.sample_x_shift,self.sample_y_shift,self.choice_x_shift,self.choice_y_shift,self.current_correction,self.current_correct,self.lat,self.init_lat))
         self.data_file.close()
 
         if self.current_correct == 0:
@@ -503,6 +442,11 @@ class Experiment_Staging(FloatLayout):
             self.current_correction = 0
 
     def set_new_trial_configuration(self):
+        
+        if self.current_trial >= self.block_threshold:
+            self.remove_widget(self.delay_hold_button)
+            self.block_hold()
+            return
 
         self.current_correction = 0
 
@@ -600,6 +544,34 @@ class Experiment_Staging(FloatLayout):
 
         self.current_trial += 1
         self.start_iti()
+        
+    def block_hold(self,*args):
+        self.delay_hold_button.unbind(on_release=self.premature_response)
+        self.remove_widget(self.delay_hold_button)
+        if self.current_block == self.block_count:
+            self.end_experiment_screen()
+        self.current_block += 1
+        self.current_trial -= 1
+        self.block_threshold += self.threshold_increment
+
+
+        self.block_instruction_wid = Label(text='PRESS BUTTON TO CONTINUE WHEN READY',font_size='50sp')
+        self.block_instruction_wid.size_hint = (.5,.3)
+        self.block_instruction_wid.pos = ((self.center_x - (0.25 * self.monitor_x_dim)),(self.center_y - (0.15*self.monitor_y_dim) + (0.3*self.monitor_y_dim)))
+
+        self.block_button = Button(text='Continue')
+        self.block_button.size_hint = (.2,.1)
+        self.block_button.pos = ((self.center_x - (0.1 * self.monitor_x_dim)),(self.center_y - (0.05*self.monitor_y_dim) + (-0.4*self.monitor_y_dim)))
+        self.block_button.bind(on_press = self.block_press)
+
+        self.add_widget(self.block_instruction_wid)
+        self.add_widget(self.block_button)
+
+    def block_press(self,*args):
+        self.remove_widget(self.block_instruction_wid)
+        self.remove_widget(self.block_button)
+        self.set_new_trial_configuration()
+        self.add_widget(self.delay_hold_button)
 
     def start_iti(self):
         self.start_iti_time = time.time()
@@ -625,12 +597,18 @@ class Experiment_Staging(FloatLayout):
 
 class Experiment_App(App):
     def build(self):
-        experiment = Experiment_Staging()
+        experiment = Experiment_Staging(trial_max = self.trial_max,session_max = self.session_max,block_length=self.block_length,block_count=self.block_count,id_entry=self.id_entry)
         return experiment
+    def set(self,trial_max,session_max,block_length,block_count,id_entry):
+        self.trial_max = trial_max
+        self.session_max = session_max
+        self.block_length = block_length
+        self.block_count = block_count
+        self.id_entry = id_entry
 
 if __name__ == '__main__':
-    monitor_x_dim = GetSystemMetrics(0)
-    monitor_y_dim = GetSystemMetrics(1)
-    Window.size = (monitor_x_dim,monitor_y_dim)
-    Window.fullscreen = True
-    Experiment_App().run()
+    #monitor_x_dim = GetSystemMetrics(0)
+    #monitor_y_dim = GetSystemMetrics(1)
+    #Window.size = (monitor_x_dim,monitor_y_dim)
+    #Window.fullscreen = True
+    Experiment_App().run()import random

@@ -52,7 +52,6 @@ class ImageButton(ButtonBehavior,Image):
 class Experiment_Staging(FloatLayout):
     def __init__(self,trial_max,session_max,block_max,block_count,probe_check,id_entry,**kwargs):
         super(Experiment_Staging,self).__init__(**kwargs)
-        
         self.curr_dir = os.getcwd()
         if sys.platform == 'linux':
             self.config_path = self.curr_dir + '/Configuration.ttconfig'
@@ -73,7 +72,7 @@ class Experiment_Staging(FloatLayout):
         Config.set('graphics', 'width', '0')
         Config.set('graphics', 'height', '0')
         self.size = (self.monitor_x_dim,self.monitor_y_dim)
-        
+
         if sys.platform == 'linux':
             self.data_add = '/Data'
             self.delay_hold_path = '%s/Images/white.png' % (self.curr_dir)
@@ -82,8 +81,7 @@ class Experiment_Staging(FloatLayout):
             self.data_add = '\\Data'
             self.delay_hold_path = '%s\\Images\\white.png' % (self.curr_dir)
             self.folder_symbol = '\\'
-
-
+            
         self.trial_displayed = False
         self.data_dir = self.curr_dir + self.data_add
         if not os.path.exists(self.data_dir):
@@ -128,10 +126,10 @@ class Experiment_Staging(FloatLayout):
         self.stimulus_duration = 1
         self.block_hold_time = 5
 
-        self.image_list = ['horizontal','horizontal','horizontal','horizontal','vertical','left','right','rings']
+        self.image_list = ['triangle','triangle','triangle','triangle','8','18','icicle down','icicle up']
         self.image_list_pos = random.randint(0,7)
         self.current_image = 'snowflake'
-        
+
         self.contrast_list = ['','-50','-25','-125']
         self.contrast_list_pos = random.randint(0,3)
         self.image_name_contrast = '%s%s' % (
@@ -141,7 +139,7 @@ class Experiment_Staging(FloatLayout):
         self.distractor_congruent = random.randint(0,1)
         if self.distractor_active == 1:
             if self.distractor_congruent == 0:
-                if self.image_list[self.image_list_pos] == 'horizontal':
+                if self.image_list[self.image_list_pos] == '33':
                     self.distractor_image_pos = random.randint(4, 7)
                 else:
                     self.distractor_image_pos = 0
@@ -172,7 +170,7 @@ class Experiment_Staging(FloatLayout):
         self.participant_data_folder = self.data_dir + self.folder_symbol + self.id_no + self.folder_symbol
         if os.path.exists(self.participant_data_folder) == False:
             os.makedirs(self.participant_data_folder)
-        self.participant_data_path = self.participant_data_folder + 'iCPT %s.csv' % (self.id_no)
+        self.participant_data_path = self.participant_data_folder + 'iCPT2 %s.csv' % (self.id_no)
         self.data_col_names = 'TrialNo, Stage, Block #, Trial Type, Correction Trial, Correct, Response Latency'
         self.data_file = open(self.participant_data_path, "w+")
         self.data_file.write(self.data_col_names)
@@ -186,7 +184,7 @@ class Experiment_Staging(FloatLayout):
         self.instruction_label.size_hint = (.7,.3)
         self.instruction_label.pos = ((self.center_x - (0.35 * self.monitor_x_dim)),(self.center_y - (0.15*self.monitor_y_dim) + (0.2*self.monitor_y_dim)))
 
-        self.initiate_button = Button(text='Press to Begin')
+        self.initiate_button = Button(text='Press to Start')
         self.initiate_button.size_hint = (.1,.1)
         self.initiate_button.pos = ((self.center_x - (0.05 * self.monitor_x_dim)),(self.center_y - (0.05*self.monitor_y_dim) - (0.2*self.monitor_y_dim)))
         self.initiate_button.bind(on_press = self.clear_instruction)
@@ -237,7 +235,6 @@ class Experiment_Staging(FloatLayout):
                     self.image_path = '%s\\Images\\%s.png' % (self.curr_dir, self.image_name_contrast)
                 self.image_wid = ImageButton(
                     source=self.image_path,allow_stretch=True)
-                
             elif self.current_stage == 0:
                 if sys.platform == 'linux':
                     self.image_path = '%s/Images/snowflake.png' % (self.curr_dir)
@@ -290,7 +287,7 @@ class Experiment_Staging(FloatLayout):
             if self.current_stage == 5 and self.distractor_active == 1:
                 self.remove_widget(self.distractor_one_wid)
                 self.remove_widget(self.distractor_two_wid)
-            if (self.image_list[self.image_list_pos] == 'horizontal') or (self.current_image == 'snowflake'):
+            if (self.image_list[self.image_list_pos] == '33') | (self.current_image == 'snowflake'):
                 self.current_correct = 0
                 self.trial_contingency = 4
             else:
@@ -315,7 +312,7 @@ class Experiment_Staging(FloatLayout):
         if self.current_stage == 5 and self.distractor_active == 1:
             self.remove_widget(self.distractor_one_wid)
             self.remove_widget(self.distractor_two_wid)
-        if (self.image_list[self.image_list_pos] == 'horizontal') | (self.current_image == 'snowflake'):
+        if (self.image_list[self.image_list_pos] == 'triangle') or (self.current_image == 'snowflake'):
             self.response_correct()
         else:
             self.response_incorrect()
@@ -358,7 +355,6 @@ class Experiment_Staging(FloatLayout):
         self.delay_hold_button.bind(on_press=self.start_iti)
         if (self.current_total_hits <= 10 and self.current_stage == 0) or ((self.current_total_hits < (self.hit_threshold) and (self.current_stage != 0))):
             self.feedback_report()
-            print('incorrect feedback')
         self.record_data()
 
 
@@ -415,11 +411,9 @@ class Experiment_Staging(FloatLayout):
 
 
         self.current_trial += 1
-
         if self.current_total_hits >= 10 and self.current_stage == 0:
             self.remove_widget(self.delay_hold_button)
             self.block_hold()
-            return
         if self.current_total_hits >= self.hit_threshold:
             self.remove_widget(self.delay_hold_button)
             self.block_hold()
@@ -427,16 +421,15 @@ class Experiment_Staging(FloatLayout):
         if self.current_stage == 4:
             self.contrast_list_pos = random.randint(0, 3)
             self.image_name_contrast = '%s%s' % (self.image_list[self.image_list_pos], self.contrast_list[self.contrast_list_pos])
-            self.current_image = self.image_name_contrast
         if self.current_stage == 5:
             self.distractor_active = random.randint(0,1)
             self.distractor_congruent = random.randint(0,1)
             if self.distractor_congruent == 0:
-                self.congruent_label = 'Incongruent'
-                if self.image_list[self.image_list_pos] == 'horizontal':
-                    self.distractor_image_pos = random.randint(4,7)
-                else:
-                    self.distractor_image_pos = 0
+                    self.congruent_label = 'Incongruent'
+                    if self.image_list[self.image_list_pos] == '33':
+                        self.distractor_image_pos = random.randint(4,7)
+                    else:
+                        self.distractor_image_pos = 0
             elif self.distractor_congruent == 1:
                 self.congruent_label = 'Congruent'
                 self.distractor_image_pos = self.image_list_pos
@@ -445,7 +438,6 @@ class Experiment_Staging(FloatLayout):
             else:
                 self.distractor_label = 'Distractor'
             self.current_image = '%s-%s-%s' % (self.image_list[self.image_list_pos],self.distractor_label,self.congruent_label)
-                
         if self.current_stage == 2:
             self.stimulus_duration_pos = random.randint(0,3)
             self.stimulus_duration = self.stimulus_duration_list[self.stimulus_duration_pos]
@@ -462,8 +454,7 @@ class Experiment_Staging(FloatLayout):
     def block_hold(self,*args):
         self.delay_hold_button.unbind(on_release=self.premature_response)
         self.remove_widget(self.delay_hold_button)
-        #self.remove_widget(self.feedback_wid)
-        if self.current_block >= self.block_count:
+        if self.current_block == self.block_count:
             self.current_block = 0
             if self.current_stage == 5:
                 self.end_experiment_screen()
@@ -480,8 +471,6 @@ class Experiment_Staging(FloatLayout):
                     break
                 else:
                     self.probe_pos += 1
-                    
-            
 
         self.current_block += 1
         self.iti_time = 0.5
@@ -494,11 +483,9 @@ class Experiment_Staging(FloatLayout):
         if self.current_stage == 0:
             self.current_stage = 1
             self.current_block -= 1
-            self.hit_threshold -= self.threshold_increment
-            self.hit_threshold += 10
             self.stage_label == 'Main Task'
         if self.current_stage == 1:
-            self.stage_label = 'Main Task'
+            self.stage_label == 'Main Task'
         if self.current_stage == 2:
             self.stage_label == 'Stimulus Duration Probe'
         if self.current_stage == 3:
@@ -513,9 +500,15 @@ class Experiment_Staging(FloatLayout):
         self.block_instruction_wid.size_hint = (.5,.3)
         self.block_instruction_wid.pos = ((self.center_x - (0.25 * self.monitor_x_dim)),(self.center_y - (0.15*self.monitor_y_dim) + (0.3*self.monitor_y_dim)))
 
+        self.block_button = Button(text='Continue')
+        self.block_button.size_hint = (.2,.1)
+        self.block_button.pos = ((self.center_x - (0.1 * self.monitor_x_dim)),(self.center_y - (0.05*self.monitor_y_dim) + (-0.4*self.monitor_y_dim)))
+        self.block_button.bind(on_press = self.block_press)
+
         self.add_widget(self.block_instruction_wid)
         self.block_button_active = False
         self.block_continue_stage()
+
 
     def block_continue_stage(self, *args):
         if self.block_button_active == False:
@@ -531,6 +524,7 @@ class Experiment_Staging(FloatLayout):
                                      (self.center_y - (0.05 * self.monitor_y_dim) + (-0.4 * self.monitor_y_dim)))
             self.block_button.bind(on_press=self.block_press)
             self.add_widget(self.block_button)
+
 
     def block_press(self,*args):
         self.remove_widget(self.block_instruction_wid)
