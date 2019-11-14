@@ -24,7 +24,7 @@ class Experiment_Configuration():
         self.session_max_label.grid(row=2,column=0)
 
         self.session_max_input = tk.Entry(self.main_run)
-        self.session_max_input.grid(row=2,column=3)
+        self.session_max_input.grid(row=2,column=2)
         self.session_max_input.insert(tk.END,'3600')
         
         self.block_length_label = tk.Label(self.main_run,text='Block Length:')
@@ -45,7 +45,7 @@ class Experiment_Configuration():
         self.id_entry_label.grid(row=5,column=0)
 
         self.id_entry_input = tk.Entry(self.main_run)
-        self.id_entry_input.grid(row=5,column=3)
+        self.id_entry_input.grid(row=5,column=2)
 
         self.execute_button = tk.Button(self.main_run,text='Execute',command=self.start_protocol)
         self.execute_button.grid(row=6,column=1)
@@ -63,3 +63,5 @@ class Experiment_Configuration():
         import Protocols as pr
         
         pr.Route_Switch('TUNL',self.parameters)
+
+
