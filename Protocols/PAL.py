@@ -1,6 +1,35 @@
+import random
+import os
+import time
+import sys
 from kivy.config import Config
+
+curr_dir = os.getcwd()
+if sys.platform == 'linux':
+    config_path = curr_dir + '/Configuration.ttconfig'
+elif sys.platform == 'win32':
+    config_path = curr_dir + '\\Configuration.ttconfig'
+
+config_file = open(config_path, 'r')
+configurations = config_file.readlines()
+monitor_x_dim = configurations[0]
+monitor_x_dim = monitor_x_dim.replace('x_dim = ', '')
+monitor_x_dim = monitor_x_dim.replace('\n', '')
+monitor_x_dim = int(monitor_x_dim)
+monitor_y_dim = configurations[1]
+monitor_y_dim = monitor_y_dim.replace('y_dim = ', '')
+monitor_y_dim = monitor_y_dim.replace('\n', '')
+monitor_y_dim = int(monitor_y_dim)
+fullscreen = configurations[2]
+fullscreen = fullscreen.replace('fullscreen = ', '')
+fullscreen = fullscreen.replace('\n', '')
+fullscreen = str(fullscreen)
+config_file.close()
+
 Config.set('kivy', 'keyboard_mode', 'systemandmulti')
-#Config.set('graphics', 'fullscreen', '1')
+Config.set('graphics', 'fullscreen', fullscreen)
+Config.set('graphics', 'width', monitor_x_dim)
+Config.set('graphics', 'height', monitor_y_dim)
 import kivy
 from kivy.app import App
 from kivy.uix.widget import Widget
@@ -8,16 +37,13 @@ from kivy.uix.button import Button
 from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.floatlayout import FloatLayout
-from win32api import GetSystemMetrics
+# from win32api import GetSystemMetrics
 from kivy.core.window import Window
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.clock import Clock
 from kivy.uix.textinput import TextInput
 from kivy.uix.vkeyboard import VKeyboard
 from functools import partial
-import random
-import os
-import time
 
 class ImageButton(ButtonBehavior,Image):
     def __init__(self,**kwargs):
@@ -26,13 +52,37 @@ class ImageButton(ButtonBehavior,Image):
 class Experiment_Staging(FloatLayout):
     def __init__(self,trial_max,session_max,block_length,block_count,id_entry,**kwargs):
         super(Experiment_Staging,self).__init__(**kwargs)
-        self.monitor_x_dim = GetSystemMetrics(0)
-        self.monitor_y_dim = GetSystemMetrics(1)
-        self.size = (self.monitor_x_dim,self.monitor_y_dim)
-
         self.curr_dir = os.getcwd()
+        if sys.platform == 'linux':
+            self.config_path = self.curr_dir + '/Configuration.ttconfig'
+        elif sys.platform == 'win32':
+            self.config_path = self.curr_dir + '\\Configuration.ttconfig'
+
+        self.config_file = open(self.config_path, 'r')
+        self.configurations = self.config_file.readlines()
+        self.monitor_x_dim = self.configurations[0]
+        self.monitor_x_dim = self.monitor_x_dim.replace('x_dim = ', '')
+        self.monitor_x_dim = self.monitor_x_dim.replace('\n', '')
+        self.monitor_x_dim = int(self.monitor_x_dim)
+        self.monitor_y_dim = self.configurations[1]
+        self.monitor_y_dim = self.monitor_y_dim.replace('y_dim = ', '')
+        self.monitor_y_dim = self.monitor_y_dim.replace('\n', '')
+        self.monitor_y_dim = int(self.monitor_y_dim)
+        self.config_file.close()
+        Config.set('graphics', 'width', '0')
+        Config.set('graphics', 'height', '0')
+        self.size = (self.monitor_x_dim, self.monitor_y_dim)
+
+        if sys.platform == 'linux':
+            self.data_add = '/Data'
+            self.delay_hold_path = '%s/Images/white.png' % (self.curr_dir)
+            self.folder_symbol = '/'
+        elif sys.platform == 'win32':
+            self.data_add = '\\Data'
+            self.delay_hold_path = '%s\\Images\\white.png' % (self.curr_dir)
+            self.folder_symbol = '\\'
         self.trial_displayed = False
-        self.data_dir = self.curr_dir + "\\Data"
+        self.data_dir = self.curr_dir + self.data_add
         if not os.path.exists(self.data_dir):
             os.makedirs(self.data_dir)
 
@@ -51,6 +101,9 @@ class Experiment_Staging(FloatLayout):
         
         self.block_count = block_count
         self.block_length = block_length
+        self.block_threshold = block_length
+        self.block_hold_time = 5
+        self.current_block = 1
 
         self.current_trial = 1
         self.current_stage = 0
@@ -62,12 +115,14 @@ class Experiment_Staging(FloatLayout):
         self.presentation_delay_time = 1
         self.feedback_length = 1
         self.stimulus_duration = 1
+
+        self.total_correct = 0
         
         self.id_no = id_entry
 
         self.image_list = ['horizontal','left','right']
         self.train_list = ['rings','grey']
-        self.image_correct_pos = [0,-1,1]
+        self.image_correct_pos = [-1,0,1]
         #self.image_correct_selected = random.randint(0,2)
 
         #self.image_incorrect_selected = random.randint(0,2)
@@ -100,7 +155,7 @@ class Experiment_Staging(FloatLayout):
         self.current_correct = 0
         self.current_correction = 0
 
-        self.delay_hold_button = ImageButton(source='%s\\Images\\white.png' % (self.curr_dir), allow_stretch=True)
+        self.delay_hold_button = ImageButton(source=self.delay_hold_path, allow_stretch=True)
         self.delay_hold_button.size_hint = (.16,.16)
         self.delay_hold_button.pos = ((self.center_x - (0.08 * self.monitor_x_dim)),(self.center_y - (0.08 * self.monitor_y_dim) - (0.4 * self.monitor_y_dim)))
 
@@ -110,7 +165,7 @@ class Experiment_Staging(FloatLayout):
 
 
     def id_setup(self):
-        self.participant_data_folder = self.data_dir + '\\' + self.id_no + '\\'
+        self.participant_data_folder = self.data_dir + self.folder_symbol + self.id_no + self.folder_symbol
         if os.path.exists(self.participant_data_folder) == False:
             os.makedirs(self.participant_data_folder)
         self.participant_data_path = self.participant_data_folder + 'PAL %s.csv' % (self.id_no)
@@ -141,7 +196,7 @@ class Experiment_Staging(FloatLayout):
         self.trial_initiation()
 
     def trial_initiation(self):
-        self.initiation_image_wid = ImageButton(source='%s\\Images\\white.png' % (self.curr_dir), allow_stretch=True)
+        self.initiation_image_wid = ImageButton(source=self.delay_hold_path, allow_stretch=True)
         self.initiation_image_wid.size_hint = (.16,.16)
         self.initiation_image_wid.pos = ((self.center_x - (0.08 * self.monitor_x_dim)),(self.center_y - (0.08 * self.monitor_y_dim) - (0.4 * self.monitor_y_dim)))
         self.initiation_image_wid.bind(on_press= self.initiation_detected)
@@ -172,19 +227,35 @@ class Experiment_Staging(FloatLayout):
             self.delay_hold_button.unbind(on_release=self.premature_response)
             
             if self.current_stage == 1:
-                self.correct_image_wid = ImageButton(source='%s\\Images\\%s.png' % (self.curr_dir,self.image_list[self.image_correct_selected]), allow_stretch=True)
+                if sys.platform == 'linux':
+                    self.image_path1 = '%s/Images/%s.png' % (self.curr_dir,self.image_list[self.image_correct_selected])
+                elif sys.platform == 'win32':
+                    self.image_path1 = '%s\\Images\\%s.png' % (self.curr_dir,self.image_list[self.image_correct_selected])
+                self.correct_image_wid = ImageButton(source=self.image_path1, allow_stretch=True)
             else:
-                self.correct_image_wid = ImageButton(source='%s\\Images\\rings.png' % (self.curr_dir), allow_stretch=True)
+                if sys.platform == 'linux':
+                    self.image_path1 = '%s/Images/rings.png' % (self.curr_dir)
+                elif sys.platform == 'win32':
+                    self.image_path1 = '%s\\Images\\rings.png' % (self.curr_dir)
+                self.correct_image_wid = ImageButton(source=self.image_path1, allow_stretch=True)
             self.correct_image_wid.size_hint = (.3, .3)
             self.correct_image_wid.pos = (
-            (self.center_x - (0.15 * self.monitor_x_dim) + (0.3 * self.image_correct_pos[self.image_correct_selected] * self.monitor_x_dim)), (self.center_y - (0.15 * self.monitor_y_dim)))
+            (self.center_x - (0.15 * self.monitor_x_dim) + (0.3 * self.image_correct_pos[self.image_correct_position] * self.monitor_x_dim)), (self.center_y - (0.15 * self.monitor_y_dim)))
             self.correct_image_wid.bind(on_press= self.response_correct)
             self.add_widget(self.correct_image_wid)
 
             if self.current_stage == 1:
-                self.incorrect_image_wid = ImageButton(source='%s\\Images\\%s.png' % (self.curr_dir,self.image_list[self.image_incorrect_selected]), allow_stretch=True)
+                if sys.platform == 'linux':
+                    self.image_path2 = '%s/Images/%s.png' % (self.curr_dir,self.image_list[self.image_incorrect_selected])
+                elif sys.platform == 'win32':
+                    self.image_path2 = '%s\\Images\\%s.png' % (self.curr_dir,self.image_list[self.image_incorrect_selected])
+                self.incorrect_image_wid = ImageButton(source=self.image_path2, allow_stretch=True)
             else:
-                self.incorrect_image_wid = ImageButton(source='%s\\Images\\grey.png' % (self.curr_dir), allow_stretch=True)
+                if sys.platform == 'linux':
+                    self.image_path2 = '%s/Images/grey.png' % (self.curr_dir)
+                elif sys.platform == 'win32':
+                    self.image_path2 = '%s\\Images\\grey.png' % (self.curr_dir)
+                self.incorrect_image_wid = ImageButton(source=self.image_path2, allow_stretch=True)
             self.incorrect_image_wid.size_hint = (.3, .3)
             self.incorrect_image_wid.pos = (
             (self.center_x - (0.15 * self.monitor_x_dim) + (0.3 * self.image_correct_pos[self.image_incorrect_position] * self.monitor_x_dim)), (self.center_y - (0.15 * self.monitor_y_dim)))
@@ -202,13 +273,16 @@ class Experiment_Staging(FloatLayout):
 
         self.lat = self.image_touch_time - self.image_pres_time
 
+        self.total_correct += 1
+
         self.current_correct = 1
         self.correction_active = False
         self.feedback_string = 'CORRECT'
 
+        if (self.total_correct < 10 and self.current_stage == 0) or ((self.current_trial < (self.block_threshold) and (self.current_stage != 0))):
+            self.feedback_report()
         self.record_data()
         self.set_new_trial_configuration()
-        self.feedback_report()
         self.delay_hold_button.bind(on_press=self.start_iti)
 
     def response_incorrect(self, *args):
@@ -222,8 +296,9 @@ class Experiment_Staging(FloatLayout):
         self.feedback_string = 'INCORRECT - PLEASE TRY AGAIN'
 
         self.current_correct = 0
+        if (self.total_correct < 10 and self.current_stage == 0) or ((self.current_trial < (self.block_threshold) and (self.current_stage != 0))):
+            self.feedback_report()
         self.record_data()
-        self.feedback_report()
         self.delay_hold_button.bind(on_press=self.start_iti)
 
     def premature_response(self,*args):
@@ -259,7 +334,7 @@ class Experiment_Staging(FloatLayout):
         self.current_correction = 0
         self.current_trial += 1
         
-        if self.current_trial >= self.block_length:
+        if ((self.current_trial >= self.block_threshold) and (self.current_stage == 1)) or ((self.total_correct >= 10) and (self.current_stage == 0)):
             self.remove_widget(self.delay_hold_button)
             self.block_hold()
             return
@@ -277,7 +352,7 @@ class Experiment_Staging(FloatLayout):
                 self.image_incorrect_position = 1
             elif self.image_incorrect_selected != 2 and self.image_correct_selected != 2:
                 self.image_incorrect_position = 2
-        else:
+        elif self.current_stage == 0:
             self.image_correct_position = random.randint(0,2)
             self.image_incorrect_position = random.randint(0,2)
             while self.image_correct_position == self.image_incorrect_position:
@@ -293,6 +368,7 @@ class Experiment_Staging(FloatLayout):
         if self.current_stage == 0:
             self.current_stage = 1
             self.current_block = 0
+            self.current_trial = 2
             
         self.current_block += 1
         self.current_trial -= 1
@@ -303,13 +379,25 @@ class Experiment_Staging(FloatLayout):
         self.block_instruction_wid.size_hint = (.5,.3)
         self.block_instruction_wid.pos = ((self.center_x - (0.25 * self.monitor_x_dim)),(self.center_y - (0.15*self.monitor_y_dim) + (0.3*self.monitor_y_dim)))
 
-        self.block_button = Button(text='Continue')
-        self.block_button.size_hint = (.2,.1)
-        self.block_button.pos = ((self.center_x - (0.1 * self.monitor_x_dim)),(self.center_y - (0.05*self.monitor_y_dim) + (-0.4*self.monitor_y_dim)))
-        self.block_button.bind(on_press = self.block_press)
 
         self.add_widget(self.block_instruction_wid)
-        self.add_widget(self.block_button)
+        self.block_button_active = False
+        self.block_continue_stage()
+
+    def block_continue_stage(self, *args):
+        if self.block_button_active == False:
+            Clock.schedule_interval(self.block_continue_stage, 0.01)
+            self.start_block_hold = time.time()
+            self.block_button_active = True
+        if (self.block_button_active == True) and ((self.current_time - self.start_block_hold) >= self.block_hold_time):
+            Clock.unschedule(self.block_continue_stage)
+            self.block_button_active = False
+            self.block_button = Button(text='Continue')
+            self.block_button.size_hint = (.2, .1)
+            self.block_button.pos = ((self.center_x - (0.1 * self.monitor_x_dim)),
+                                     (self.center_y - (0.05 * self.monitor_y_dim) + (-0.4 * self.monitor_y_dim)))
+            self.block_button.bind(on_press=self.block_press)
+            self.add_widget(self.block_button)
 
     def block_press(self,*args):
         self.remove_widget(self.block_instruction_wid)
@@ -370,7 +458,7 @@ class Experiment_Staging(FloatLayout):
 
 
     def end_experiment(self,*args):
-        Experiment_App.stop()
+        App.get_running_app().stop()
 
 class Experiment_App(App):
     def build(self):
@@ -384,8 +472,4 @@ class Experiment_App(App):
         self.id_entry = id_entry
 
 if __name__ == '__main__':
-    monitor_x_dim = GetSystemMetrics(0)
-    monitor_y_dim = GetSystemMetrics(1)
-    Window.size = (monitor_x_dim,monitor_y_dim)
-    Window.fullscreen = True
     Experiment_App().run()
