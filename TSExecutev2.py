@@ -26,7 +26,7 @@ class Touchscreen_UI():
 
         #self.protocol_list = [protocol.replace('.py','') for protocol in self.protocol_list]
 
-        self.protocol_list = ['iCPT','iCPTImage2','vPRL','PAL','TUNL']
+        self.protocol_list = ['iCPT','iCPTImage2','vPRL','PAL','TUNL','PR']
 
         self.main_screen = tk.Tk()
 
