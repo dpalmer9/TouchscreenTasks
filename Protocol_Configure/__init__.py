@@ -9,5 +9,7 @@ def Route_Switch(protocol,root_screen):
         import Protocol_Configure.iCPT as prca
     elif protocol == 'iCPTImage2':
         import Protocol_Configure.iCPTImage2 as prca
+    elif protocol == 'PR':
+        import Protocol_Configure.PR as prca
 
     prca.Experiment_Configuration(root_screen=root_screen)
