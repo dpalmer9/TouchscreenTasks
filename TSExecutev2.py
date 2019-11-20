@@ -59,7 +59,7 @@ class Touchscreen_UI():
         #self.main_run.destroy()
     
     def configuration_menu(self):
-        if sys.platform == 'linux':
+        if sys.platform == 'linux'or sys.platform == 'darwin':
             self.config_path = self.main_path + '/Configuration.ttconfig'
         elif sys.platform == 'win32':
             self.config_path = self.main_path + '\\Configuration.ttconfig'
