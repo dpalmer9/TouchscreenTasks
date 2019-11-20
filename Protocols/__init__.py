@@ -79,7 +79,7 @@ def Activate():
     import os
     import sys
     curr_dir = os.getcwd()
-    if sys.platform == 'linux':
+    if sys.platform == 'linux'or sys.platform == 'darwin':
         config_path = curr_dir + '/Configuration.ttconfig'
     elif sys.platform == 'win32':
         config_path = curr_dir + '\\Configuration.ttconfig'

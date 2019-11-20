@@ -4,7 +4,7 @@ import time
 import sys
 from kivy.config import Config
 curr_dir = os.getcwd()
-if sys.platform == 'linux':
+if sys.platform == 'linux'or sys.platform == 'darwin':
     config_path = curr_dir + '/Configuration.ttconfig'
 elif sys.platform == 'win32':
     config_path = curr_dir + '\\Configuration.ttconfig'
@@ -53,7 +53,7 @@ class Experiment_Staging(FloatLayout):
     def __init__(self,trial_max,reward_prob,reversal_threshold,session_max,id_entry,max_reversal,**kwargs):
         super(Experiment_Staging,self).__init__(**kwargs)
         self.curr_dir = os.getcwd()
-        if sys.platform == 'linux':
+        if sys.platform == 'linux'or sys.platform == 'darwin':
             self.config_path = self.curr_dir + '/Configuration.ttconfig'
         elif sys.platform == 'win32':
             self.config_path = self.curr_dir + '\\Configuration.ttconfig'
@@ -73,7 +73,7 @@ class Experiment_Staging(FloatLayout):
         Config.set('graphics', 'height', '0')
         self.size = (self.monitor_x_dim,self.monitor_y_dim)
         
-        if sys.platform == 'linux':
+        if sys.platform == 'linux'or sys.platform == 'darwin':
             self.data_add = '/Data'
             self.delay_hold_path = '%s/Images/white.png' % (self.curr_dir)
             self.folder_symbol = '/'
@@ -266,13 +266,13 @@ class Experiment_Staging(FloatLayout):
             self.delay_hold_button.unbind(on_release=self.premature_response)
             
             if self.current_stage == 1:
-                if sys.platform == 'linux':
+                if sys.platform == 'linux'or sys.platform == 'darwin':
                     self.image_path = '%s/Images/%s.png' % (self.curr_dir, self.image_list[0])
                 elif sys.platform == 'win32':
                     self.image_path = '%s\\Images\\%s.png' % (self.curr_dir, self.image_list[0])
                 self.one_image_wid = ImageButton(source=self.image_path, allow_stretch=True)
             elif self.current_stage == 0:
-                if sys.platform == 'linux':
+                if sys.platform == 'linux'or sys.platform == 'darwin':
                     self.image_path = '%s/Images/%s.png' % (self.curr_dir, self.train_list[0])
                 elif sys.platform == 'win32':
                     self.image_path = '%s\\Images\\%s.png' % (self.curr_dir, self.train_list[0])
@@ -284,13 +284,13 @@ class Experiment_Staging(FloatLayout):
             self.add_widget(self.one_image_wid)
 
             if self.current_stage == 1:
-                if sys.platform == 'linux':
+                if sys.platform == 'linux'or sys.platform == 'darwin':
                     self.image_path2 = '%s/Images/%s.png' % (self.curr_dir, self.image_list[1])
                 elif sys.platform == 'win32':
                     self.image_path2 = '%s\\Images\\%s.png' % (self.curr_dir, self.image_list[1])
                 self.two_image_wid = ImageButton(source=self.image_path2, allow_stretch=True)
             elif self.current_stage == 0:
-                if sys.platform == 'linux':
+                if sys.platform == 'linux'or sys.platform == 'darwin':
                     self.image_path2 = '%s/Images/%s.png' % (self.curr_dir, self.train_list[1])
                 elif sys.platform == 'win32':
                     self.image_path2 = '%s\\Images\\%s.png' % (self.curr_dir, self.train_list[1])

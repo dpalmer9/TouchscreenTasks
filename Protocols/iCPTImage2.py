@@ -4,7 +4,7 @@ import time
 import sys
 from kivy.config import Config
 curr_dir = os.getcwd()
-if sys.platform == 'linux':
+if sys.platform == 'linux'or sys.platform == 'darwin':
     config_path = curr_dir + '/Configuration.ttconfig'
 elif sys.platform == 'win32':
     config_path = curr_dir + '\\Configuration.ttconfig'
@@ -53,7 +53,7 @@ class Experiment_Staging(FloatLayout):
     def __init__(self,trial_max,session_max,block_max,block_count,probe_check,id_entry,**kwargs):
         super(Experiment_Staging,self).__init__(**kwargs)
         self.curr_dir = os.getcwd()
-        if sys.platform == 'linux':
+        if sys.platform == 'linux'or sys.platform == 'darwin':
             self.config_path = self.curr_dir + '/Configuration.ttconfig'
         elif sys.platform == 'win32':
             self.config_path = self.curr_dir + '\\Configuration.ttconfig'
@@ -73,7 +73,7 @@ class Experiment_Staging(FloatLayout):
         Config.set('graphics', 'height', '0')
         self.size = (self.monitor_x_dim,self.monitor_y_dim)
 
-        if sys.platform == 'linux':
+        if sys.platform == 'linux'or sys.platform == 'darwin':
             self.data_add = '/Data'
             self.delay_hold_path = '%s/Images/white.png' % (self.curr_dir)
             self.folder_symbol = '/'
@@ -229,21 +229,21 @@ class Experiment_Staging(FloatLayout):
             self.delay_hold_button.bind(on_release=self.hold_removed_presentation)
             self.delay_hold_button.bind(on_press=self.hold_returned_presentation)
             if self.current_stage == 4:
-                if sys.platform == 'linux':
+                if sys.platform == 'linux'or sys.platform == 'darwin':
                     self.image_path = '%s/Images/%s.png' % (self.curr_dir, self.image_name_contrast)
                 elif sys.platform == 'win32':
                     self.image_path = '%s\\Images\\%s.png' % (self.curr_dir, self.image_name_contrast)
                 self.image_wid = ImageButton(
                     source=self.image_path,allow_stretch=True)
             elif self.current_stage == 0:
-                if sys.platform == 'linux':
+                if sys.platform == 'linux'or sys.platform == 'darwin':
                     self.image_path = '%s/Images/snowflake.png' % (self.curr_dir)
                 elif sys.platform == 'win32':
                     self.image_path = '%s\\Images\\snowflake.png' % (self.curr_dir)
                 self.image_wid = ImageButton(source=self.image_path,allow_stretch=True)
                 self.current_image = 'snowflake'
             else:
-                if sys.platform == 'linux':
+                if sys.platform == 'linux'or sys.platform == 'darwin':
                     self.image_path = '%s/Images/%s.png' % (self.curr_dir, self.image_list[self.image_list_pos])
                 elif sys.platform == 'win32':
                     self.image_path = '%s\\Images\\%s.png' % (self.curr_dir, self.image_list[self.image_list_pos])
@@ -254,7 +254,7 @@ class Experiment_Staging(FloatLayout):
             (self.center_x - (0.2 * self.monitor_x_dim)), (self.center_y - (0.2 * self.monitor_y_dim)))
             self.image_wid.bind(on_press= self.image_pressed)
             if self.current_stage == 5 and self.distractor_active == 1:
-                if sys.platform == 'linux':
+                if sys.platform == 'linux'or sys.platform == 'darwin':
                     self.image_path_d1 = '%s/Images/%s.png' % (self.curr_dir, self.image_list[self.distractor_image_pos])
                 elif sys.platform == 'win32':
                     self.image_path_d1 = '%s\\Images\\%s.png' % (self.curr_dir, self.image_list[self.distractor_image_pos])
@@ -263,7 +263,7 @@ class Experiment_Staging(FloatLayout):
                 self.distractor_one_wid.pos = (
                     (self.center_x - (0.2 * self.monitor_x_dim) - (0.25 * self.monitor_x_dim)), (self.center_y - (0.2 * self.monitor_y_dim)))
 
-                if sys.platform == 'linux':
+                if sys.platform == 'linux'or sys.platform == 'darwin':
                     self.image_path_d2 = '%s/Images/%s.png' % (self.curr_dir, self.image_list[self.distractor_image_pos])
                 elif sys.platform == 'win32':
                     self.image_path_d2 = '%s\\Images\\%s.png' % (self.curr_dir, self.image_list[self.distractor_image_pos])

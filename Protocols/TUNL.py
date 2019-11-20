@@ -4,7 +4,7 @@ import time
 import sys
 from kivy.config import Config
 curr_dir = os.getcwd()
-if sys.platform == 'linux':
+if sys.platform == 'linux'or sys.platform == 'darwin':
     config_path = curr_dir + '/Configuration.ttconfig'
 elif sys.platform == 'win32':
     config_path = curr_dir + '\\Configuration.ttconfig'
@@ -52,7 +52,7 @@ class Experiment_Staging(FloatLayout):
     def __init__(self,trial_max,session_max,block_length,block_count,id_entry,**kwargs):
         super(Experiment_Staging,self).__init__(**kwargs)
         self.curr_dir = os.getcwd()
-        if sys.platform == 'linux':
+        if sys.platform == 'linux'or sys.platform == 'darwin':
             self.config_path = self.curr_dir + '/Configuration.ttconfig'
         elif sys.platform == 'win32':
             self.config_path = self.curr_dir + '\\Configuration.ttconfig'
@@ -72,7 +72,7 @@ class Experiment_Staging(FloatLayout):
         Config.set('graphics', 'height', '0')
         self.size = (self.monitor_x_dim,self.monitor_y_dim)
         
-        if sys.platform == 'linux':
+        if sys.platform == 'linux'or sys.platform == 'darwin':
             self.data_add = '/Data'
             self.delay_hold_path = '%s/Images/white.png' % (self.curr_dir)
             self.yellow_path = '%s/Images/yellow.png' % (self.curr_dir)
@@ -254,7 +254,7 @@ class Experiment_Staging(FloatLayout):
         self.background_image_list = [Image() for i in range(64)]
         for image in self.background_image_list:
             image.size_hint = (.08,.08)
-            if sys.platform == 'linux':
+            if sys.platform == 'linux'or sys.platform == 'darwin':
                 self.image_path = '%s/Images/grey.png' % (self.curr_dir)
             elif sys.platform == 'win32':
                 self.image_path = '%s\\Images\\grey.png' % (self.curr_dir)
@@ -317,7 +317,6 @@ class Experiment_Staging(FloatLayout):
         if self.delay_clock_start == False:
             Clock.schedule_interval(self.sample_delay_end, 0.01)
             self.delay_clock_start = True
-            print('%s %s %s' % (self.delay_clock_start, self.current_stage, self.interference_active))
         if (self.delay_clock_start == True) and (self.current_stage == 2) and (self.interference_active == False) and ((self.current_time - self.delay_start) < (self.iti_time - self.interference_presentation_length)):
             self.intereference_image_wid = ImageButton(source=self.yellow_path,
                                                     allow_stretch=True)
