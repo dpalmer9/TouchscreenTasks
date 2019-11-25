@@ -183,7 +183,7 @@ class Experiment_Staging(FloatLayout):
     def instruction_presentation(self):
         self.instruction_label = Label(text= 'During the experiment, hold your finger on the white square before responding .\nTo make a response, press on one of the images on the centre of the screen.\nYou will receive feedback following touching an image.'
                                        , font_size = '40sp')
-        self.instruction_label.size_hint = (.7,.3)
+        self.instruction_label.size_hint = (.6,.4)
         self.instruction_label.pos = ((self.center_x - (0.35 * self.monitor_x_dim)),(self.center_y - (0.15*self.monitor_y_dim) + (0.2*self.monitor_y_dim)))
 
         self.initiate_button = Button(text='Press to Begin')
@@ -264,7 +264,7 @@ class Experiment_Staging(FloatLayout):
                 self.distractor_one_wid = ImageButton(source=self.image_path_d1, allow_stretch=True)
                 self.distractor_one_wid.size_hint = (.4, .4)
                 self.distractor_one_wid.pos = (
-                    (self.center_x - (0.2 * self.monitor_x_dim) - (0.25 * self.monitor_x_dim)), (self.center_y - (0.2 * self.monitor_y_dim)))
+                    (self.center_x - (0.2 * self.monitor_x_dim) - (0.33 * self.monitor_x_dim)), (self.center_y - (0.2 * self.monitor_y_dim)))
 
                 if sys.platform == 'linux'or sys.platform == 'darwin':
                     self.image_path_d2 = '%s/Images/%s.png' % (self.curr_dir, self.image_list[self.distractor_image_pos])
@@ -274,7 +274,7 @@ class Experiment_Staging(FloatLayout):
                     source=self.image_path_d2,allow_stretch=True)
                 self.distractor_two_wid.size_hint = (.4, .4)
                 self.distractor_two_wid.pos = (
-                    (self.center_x - (0.2 * self.monitor_x_dim) + (0.25 * self.monitor_x_dim)),
+                    (self.center_x - (0.2 * self.monitor_x_dim) + (0.33 * self.monitor_x_dim)),
                     (self.center_y - (0.2 * self.monitor_y_dim)))
 
                 self.add_widget(self.distractor_one_wid)
@@ -415,11 +415,12 @@ class Experiment_Staging(FloatLayout):
 
         self.current_trial += 1
 
-        if self.current_total_hits >= 10 and self.current_stage == 0:
+
+        if self.current_total_hits >= self.hit_threshold and self.current_stage > 0:
             self.remove_widget(self.delay_hold_button)
             self.block_hold()
             return
-        if self.current_total_hits >= self.hit_threshold:
+        if self.current_total_hits >= 10 and self.current_stage == 0:
             self.remove_widget(self.delay_hold_button)
             self.block_hold()
             return
@@ -462,7 +463,7 @@ class Experiment_Staging(FloatLayout):
         self.delay_hold_button.unbind(on_release=self.premature_response)
         self.remove_widget(self.delay_hold_button)
         #self.remove_widget(self.feedback_wid)
-        if self.current_block >= self.block_count:
+        if (self.current_block >= self.block_count) and (self.current_stage > 0):
             self.current_block = 0
             if self.current_stage == 5:
                 self.end_experiment_screen()
@@ -483,9 +484,9 @@ class Experiment_Staging(FloatLayout):
             
 
         self.current_block += 1
-        self.iti_time = 0.5
+        #self.iti_time = 0.5
         self.presentation_delay_time = 1
-        self.feedback_length = 0.5
+        #self.feedback_length = 0.5
         self.stimulus_duration = 1
         self.current_trial -= 1
         self.hit_threshold += self.threshold_increment

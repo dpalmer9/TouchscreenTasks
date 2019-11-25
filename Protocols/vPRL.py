@@ -217,7 +217,7 @@ class Experiment_Staging(FloatLayout):
     def instruction_presentation(self):
         self.instruction_label = Label(text= '[color=FFFFFF]To start trials, press the white button.[/color]\n[color=FFFFFF]To make a response, press on one of the images on the screen.[/color]\n[color=FFFFFF]You will receive feedback following a response.[/color]'
                                        , font_size = '40sp',markup=True)
-        self.instruction_label.size_hint = (.5,.2)
+        self.instruction_label.size_hint = (.6,.4)
         self.instruction_label.pos = ((self.center_x - (0.25 * self.monitor_x_dim)),(self.center_y - (0.1*self.monitor_y_dim) + (0.2*self.monitor_y_dim)))
 
         self.initiate_button = Button(text='Press to Start')
@@ -509,7 +509,7 @@ class Experiment_Staging(FloatLayout):
             if self.current_trial >= self.max_trials:
                 self.end_experiment_screen()
                 return
-            if self.current_reversal >= self.max_reversal:
+            if self.current_reversal > self.max_reversal:
                 self.end_experiment_screen()
                 return
             self.image_presentation()
