@@ -216,7 +216,8 @@ class Experiment_Staging(FloatLayout):
 
     def instruction_presentation(self):
         self.instruction_label = Label(text= '[color=FFFFFF]To start trials, press the white button.[/color]\n[color=FFFFFF]To make a response, press on one of the images on the screen.[/color]\n[color=FFFFFF]You will receive feedback following a response.[/color]'
-                                       , font_size = '40sp',markup=True)
+                                       , font_size = '35sp',markup=True
+                                       ,text_size = ((0.8*self.monitor_x_dim),(0.4*self.monitor_y_dim)))
         self.instruction_label.size_hint = (.6,.4)
         self.instruction_label.pos = ((self.center_x - (0.25 * self.monitor_x_dim)),(self.center_y - (0.1*self.monitor_y_dim) + (0.2*self.monitor_y_dim)))
 
@@ -520,7 +521,8 @@ class Experiment_Staging(FloatLayout):
         self.delay_hold_button.unbind(on_release=self.premature_response)
         self.remove_widget(self.delay_hold_button)
 
-        self.end_feedback = Label(text='Thank you for your participation. Please press EXIT to end experiment.',font_size='50sp')
+        self.end_feedback = Label(text='Thank you for your participation. Please press EXIT to end experiment.',font_size='50sp'
+                                  ,text_size = ((0.8*self.monitor_x_dim),(0.4*self.monitor_y_dim)))
         self.end_feedback.size_hint = (.6,.4)
         self.end_feedback.pos = ((self.center_x - (0.35 * self.monitor_x_dim)),(self.center_y - (0.2*self.monitor_y_dim)))
 
