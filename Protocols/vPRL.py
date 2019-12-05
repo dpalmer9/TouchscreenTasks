@@ -103,8 +103,8 @@ class Experiment_Staging(FloatLayout):
         self.max_time = session_max
         self.id_no = id_entry
         self.max_reversal = max_reversal
-        self.reward_prob_smin = reward_prob * 100
-        self.reward_prob_spos = 100 - self.reward_prob_smin
+        self.reward_prob_smin = 100
+        self.reward_prob_spos = 0
 
 
         self.current_trial = 1
@@ -434,6 +434,8 @@ class Experiment_Staging(FloatLayout):
         self.current_stage = 1
         self.current_trial = 0
         self.current_score = 0
+        self.reward_prob_smin = reward_prob * 100
+        self.reward_prob_spos = 100 - self.reward_prob_smin
         self.scoreboard_wid.text = 'Your Points:\n       %s' % (self.current_score)
         self.stage_label = 'Main Task - Reversal 0'
             
@@ -519,7 +521,7 @@ class Experiment_Staging(FloatLayout):
         self.remove_widget(self.delay_hold_button)
 
         self.end_feedback = Label(text='Thank you for your participation. Please press EXIT to end experiment.',font_size='50sp')
-        self.end_feedback.size_hint = (.7,.4)
+        self.end_feedback.size_hint = (.6,.4)
         self.end_feedback.pos = ((self.center_x - (0.35 * self.monitor_x_dim)),(self.center_y - (0.2*self.monitor_y_dim)))
 
         self.end_button = Button(text='EXIT')

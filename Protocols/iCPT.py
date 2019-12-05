@@ -590,7 +590,7 @@ class Experiment_Staging(FloatLayout):
         self.remove_widget(self.delay_hold_button)
 
         self.end_feedback = Label(text='Thank you for your participation. Please press EXIT to end experiment.',font_size='50sp')
-        self.end_feedback.size_hint = (.7,.4)
+        self.end_feedback.size_hint = (.6,.4)
         self.end_feedback.pos = ((self.center_x - (0.35 * self.monitor_x_dim)),(self.center_y - (0.2*self.monitor_y_dim)))
 
         self.end_button = Button(text='EXIT')
