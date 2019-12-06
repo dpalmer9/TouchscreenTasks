@@ -103,6 +103,7 @@ class Experiment_Staging(FloatLayout):
         self.max_time = session_max
         self.id_no = id_entry
         self.max_reversal = max_reversal
+        self.reward_prob = float(reward_prob)
         self.reward_prob_smin = 100
         self.reward_prob_spos = 0
 
@@ -435,8 +436,11 @@ class Experiment_Staging(FloatLayout):
         self.current_stage = 1
         self.current_trial = 0
         self.current_score = 0
-        self.reward_prob_smin = reward_prob * 100
+        self.reward_prob_smin = self.reward_prob * 100
         self.reward_prob_spos = 100 - self.reward_prob_smin
+        self.image_one_reward_threshold = self.reward_prob_spos
+        self.image_two_reward_threshold = self.reward_prob_smin
+
         self.scoreboard_wid.text = 'Your Points:\n       %s' % (self.current_score)
         self.stage_label = 'Main Task - Reversal 0'
             
