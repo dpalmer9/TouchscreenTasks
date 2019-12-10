@@ -163,7 +163,7 @@ class Experiment_Staging(FloatLayout):
         self.current_score = 0000
         self.scoreboard_wid = Label(text = 'Your Points:\n       %s' % (self.current_score), font_size='50sp',markup=True)
         self.scoreboard_wid.size_hint = (.4,.4)
-        self.scoreboard_wid.pos = ((self.center_x - (0.2 * self.monitor_x_dim)),(self.center_y - (0.2*self.monitor_y_dim) + (0.3*self.monitor_y_dim)))
+        self.scoreboard_wid.pos = ((self.center_x - (0.2 * self.monitor_x_dim)),(self.center_y - (0.2*self.monitor_y_dim) + (0.4*self.monitor_y_dim)))
 
 
         Clock.schedule_interval(self.clock_update, 0.001)
@@ -436,6 +436,7 @@ class Experiment_Staging(FloatLayout):
         self.current_stage = 1
         self.current_trial = 0
         self.current_score = 0
+        self.total_correct = 0
         self.reward_prob_smin = self.reward_prob * 100
         self.reward_prob_spos = 100 - self.reward_prob_smin
         self.image_one_reward_threshold = self.reward_prob_spos
