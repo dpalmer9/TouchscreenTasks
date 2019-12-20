@@ -24,4 +24,7 @@ The screen resolution for your PC must be manually input into the system.
 
 You will need to manually set the x and y dimensions (in pixels) for your monitor resolution. If you want the program to run in the full display of your screen, you will need to use your monitor's current resolution. If you want to use a smaller window you can customize the dimensions. If you want the program to auto stretch to full screen, you can check off the box.
 
-The list of available protocols will be in the launcher window. Currently, there are stable versions of Image Continuous Performance Task, Probabalistic Reversal Learning, Trial Unique Non-Match to Location, and Paired Associate Learning. New tasks will be added as they are completed in development.
+The list of available protocols will be in the launcher window. Currently, there are stable versions of Image Continuous Performance Task, Probabalistic Reversal Learning, Trial Unique Non-Match to Location, Progressive Ratio, and Paired Associate Learning. New tasks will be added as they are completed in development.
+
+## Contact
+Please feel free to reach out to me with suggestions, feedback, and ideas for new features!
