@@ -424,7 +424,7 @@ class Experiment_Staging(FloatLayout):
 
         self.current_correction = 0
 
-        self.image_list_pos = random.randint(0,7)
+        self.image_list_pos = random.randint(0,len(self.image_list))
         self.current_image = self.image_list[self.image_list_pos]
 
 
