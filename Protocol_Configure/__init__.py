@@ -11,6 +11,8 @@ def Route_Switch(protocol,root_screen):
         import Protocol_Configure.iCPTImage2 as prca
     elif protocol == 'iCPTStimDurationScreen':
         import Protocol_Configure.iCPTStimDurationScreen as prca
+    elif protocol == 'iCPTImageScreen':
+        import Protocol_Configure.iCPTImageScreen as prca
     elif protocol == 'PR':
         import Protocol_Configure.PR as prca
 
