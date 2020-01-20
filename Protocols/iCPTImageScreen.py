@@ -50,7 +50,7 @@ class ImageButton(ButtonBehavior,Image):
         super(ImageButton,self).__init__(**kwargs)
 
 class Experiment_Staging(FloatLayout):
-    def __init__(self,trial_max,session_max,block_max,block_count,probe_check,id_entry,**kwargs):
+    def __init__(self,trial_max,session_max,id_entry,**kwargs):
         super(Experiment_Staging,self).__init__(**kwargs)
         
         self.curr_dir = os.getcwd()
@@ -133,16 +133,15 @@ class Experiment_Staging(FloatLayout):
         self.distractor_list = ['1','2','3','5','13','14','15','16','20','30']
         self.distractor_count = round(((1 - self.image_prob) / len(self.distractor_list)) * 100,0)
 
-        self.image_count = self.image_prob * 100
+        self.image_count = int(self.image_prob * 100)
 
-        for image in range(0,self.image_prob):
+        for image in range(0,self.image_count):
             self.image_list.append(self.target_item)
 
         for distractor in self.distractor_list:
-            for repeat in range(0,self.distractor_count):
+            for repeat in range(0,int(self.distractor_count)):
                 self.image_list.append(distractor)
 
-        #self.image_list = ['horizontal','horizontal','horizontal','horizontal','vertical','left','right','rings']
         self.image_list_pos = random.randint(0,len(self.image_list))
         self.current_image = 'snowflake'
         
@@ -305,7 +304,7 @@ class Experiment_Staging(FloatLayout):
             if self.current_stage == 5 and self.distractor_active == 1:
                 self.remove_widget(self.distractor_one_wid)
                 self.remove_widget(self.distractor_two_wid)
-            if (self.image_list[self.image_list_pos] == 'horizontal') or (self.current_image == 'snowflake'):
+            if (self.image_list[self.image_list_pos] == 'horizontal') or (self.current_image == 'snowflake') or (self.current_image == self.target_item):
                 self.current_correct = 0
                 self.trial_contingency = 4
             else:
@@ -330,7 +329,7 @@ class Experiment_Staging(FloatLayout):
         if self.current_stage == 5 and self.distractor_active == 1:
             self.remove_widget(self.distractor_one_wid)
             self.remove_widget(self.distractor_two_wid)
-        if (self.image_list[self.image_list_pos] == 'horizontal') | (self.current_image == 'snowflake'):
+        if (self.image_list[self.image_list_pos] == 'horizontal') | (self.current_image == 'snowflake') | (self.current_image == self.target_item):
             self.response_correct()
         else:
             self.response_incorrect()
@@ -609,14 +608,11 @@ class Experiment_Staging(FloatLayout):
 
 class Experiment_App(App):
     def build(self):
-        experiment = Experiment_Staging(trial_max=self.trial_maximum,session_max=self.session_maximum,block_max = self.block_max,block_count=self.block_count, probe_check = self.probe_check,id_entry=self.id_value)
+        experiment = Experiment_Staging(trial_max=self.trial_maximum,session_max=self.session_maximum,id_entry=self.id_value)
         return experiment
-    def set(self,trial_max,session_max,block_max,block_count,probe_check,id_entry):
+    def set(self,trial_max,session_max,id_entry):
         self.trial_maximum = trial_max
         self.session_maximum = session_max
-        self.block_max = block_max
-        self.block_count = block_count
-        self.probe_check = probe_check
         self.id_value = id_entry
 
 if __name__ == '__main__':
