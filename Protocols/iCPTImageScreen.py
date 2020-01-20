@@ -100,7 +100,6 @@ class Experiment_Staging(FloatLayout):
         self.hold_removed = False
         self.not_pressed = True
 
-        self.probe_check = [int(x) for x in probe_check]
 
         self.delay_length = 4
 
@@ -110,9 +109,9 @@ class Experiment_Staging(FloatLayout):
 
         self.current_trial = 1
         self.current_total_hits = 0
-        self.hit_threshold = block_max
+        self.hit_threshold = 40
         self.threshold_increment = self.hit_threshold
-        self.block_count = block_count
+        self.block_count = 3
         self.current_stage = 0 # 1=main, 1=sd probe, 2=iti, 3=contrast,4=flanker
         self.time_elapsed = 0
         self.start_time = time.time()
@@ -128,8 +127,23 @@ class Experiment_Staging(FloatLayout):
         self.stimulus_duration = 1
         self.block_hold_time = 5
 
-        self.image_list = ['horizontal','horizontal','horizontal','horizontal','vertical','left','right','rings']
-        self.image_list_pos = random.randint(0,7)
+        self.image_list = []
+        self.image_prob = 0.33
+        self.target_item = '4'
+        self.distractor_list = ['1','2','3','5','13','14','15','16','20','30']
+        self.distractor_count = round(((1 - self.image_prob) / len(self.distractor_list)) * 100,0)
+
+        self.image_count = self.image_prob * 100
+
+        for image in range(0,self.image_prob):
+            self.image_list.append(self.target_item)
+
+        for distractor in self.distractor_list:
+            for repeat in range(0,self.distractor_count):
+                self.image_list.append(distractor)
+
+        #self.image_list = ['horizontal','horizontal','horizontal','horizontal','vertical','left','right','rings']
+        self.image_list_pos = random.randint(0,len(self.image_list))
         self.current_image = 'snowflake'
         
         self.contrast_list = ['','-50','-25','-125']
@@ -465,22 +479,8 @@ class Experiment_Staging(FloatLayout):
         self.remove_widget(self.delay_hold_button)
         #self.remove_widget(self.feedback_wid)
         if (self.current_block >= self.block_count) and (self.current_stage > 0):
-            self.current_block = 0
-            if self.current_stage == 5:
-                self.end_experiment_screen()
-                return
-            self.start_pos = self.probe_pos
-            for probe in range(self.start_pos,6):
-                self.current_stage += 1
-                if self.current_stage > 5:
-                    self.end_experiment_screen()
-                    return
-                if int(self.probe_check[self.probe_pos]) == 1:
-                    self.probe_pos += 1
-                    self.start_pos = self.probe_pos
-                    break
-                else:
-                    self.probe_pos += 1
+            self.end_experiment_screen()
+            return
                     
             
 
