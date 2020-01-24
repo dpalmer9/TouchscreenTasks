@@ -171,7 +171,7 @@ class Experiment_Staging(FloatLayout):
         self.participant_data_folder = self.data_dir + self.folder_symbol + self.id_no + self.folder_symbol
         if os.path.exists(self.participant_data_folder) == False:
             os.makedirs(self.participant_data_folder)
-        self.participant_data_path = self.participant_data_folder + 'iCPT %s.csv' % (self.id_no)
+        self.participant_data_path = self.participant_data_folder + 'iCPTStimDurationScreen %s.csv' % (self.id_no)
         self.data_col_names = 'TrialNo, Stage, Block #, Trial Type, Correction Trial, Correct, Response Latency'
         self.data_file = open(self.participant_data_path, "w+")
         self.data_file.write(self.data_col_names)
