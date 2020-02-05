@@ -126,7 +126,7 @@ class Experiment_Staging(FloatLayout):
         self.stimulus_duration = 1
         self.block_hold_time = 5
 
-        self.image_list = ['triangle','triangle','triangle','triangle','8','18','icicle down','icicle up']
+        self.image_list = ['Triangle','Triangle','Triangle','Triangle','8','18','icicle down','icicle up']
         self.image_list_pos = random.randint(0,7)
         self.current_image = 'snowflake'
 
@@ -287,7 +287,7 @@ class Experiment_Staging(FloatLayout):
             if self.current_stage == 5 and self.distractor_active == 1:
                 self.remove_widget(self.distractor_one_wid)
                 self.remove_widget(self.distractor_two_wid)
-            if (self.image_list[self.image_list_pos] == 'triangle') | (self.current_image == 'snowflake'):
+            if (self.image_list[self.image_list_pos] == 'Triangle') | (self.current_image == 'snowflake'):
                 self.current_correct = 0
                 self.trial_contingency = 4
             else:
@@ -312,7 +312,7 @@ class Experiment_Staging(FloatLayout):
         if self.current_stage == 5 and self.distractor_active == 1:
             self.remove_widget(self.distractor_one_wid)
             self.remove_widget(self.distractor_two_wid)
-        if (self.image_list[self.image_list_pos] == 'triangle') or (self.current_image == 'snowflake'):
+        if (self.image_list[self.image_list_pos] == 'Triangle') or (self.current_image == 'snowflake'):
             self.response_correct()
         else:
             self.response_incorrect()
@@ -486,9 +486,9 @@ class Experiment_Staging(FloatLayout):
             self.hit_threshold -= self.threshold_increment
             self.hit_threshold += 10
             self.current_block -= 1
-            self.stage_label == 'Main Task'
+            self.stage_label = 'Main Task'
         if self.current_stage == 1:
-            self.stage_label == 'Main Task'
+            self.stage_label = 'Main Task'
         if self.current_stage == 2:
             self.stage_label == 'Stimulus Duration Probe'
         if self.current_stage == 3:
