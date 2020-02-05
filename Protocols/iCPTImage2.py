@@ -483,6 +483,8 @@ class Experiment_Staging(FloatLayout):
         
         if self.current_stage == 0:
             self.current_stage = 1
+            self.hit_threshold -= self.threshold_increment
+            self.hit_threshold += 10
             self.current_block -= 1
             self.stage_label == 'Main Task'
         if self.current_stage == 1:
