@@ -287,7 +287,7 @@ class Experiment_Staging(FloatLayout):
             if self.current_stage == 5 and self.distractor_active == 1:
                 self.remove_widget(self.distractor_one_wid)
                 self.remove_widget(self.distractor_two_wid)
-            if (self.image_list[self.image_list_pos] == '33') | (self.current_image == 'snowflake'):
+            if (self.image_list[self.image_list_pos] == 'triangle') | (self.current_image == 'snowflake'):
                 self.current_correct = 0
                 self.trial_contingency = 4
             else:
