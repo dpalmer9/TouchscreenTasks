@@ -50,5 +50,5 @@ class Experiment_Configuration():
 
         import Protocols as pr
 
-        pr.Route_Switch('iCPTStimDurationScreen',self.parameters)
+        pr.Route_Switch('iCPTImageScreen',self.parameters)
 

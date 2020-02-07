@@ -142,7 +142,7 @@ class Experiment_Staging(FloatLayout):
             for repeat in range(0,int(self.distractor_count)):
                 self.image_list.append(distractor)
 
-        self.image_list_pos = random.randint(0,len(self.image_list))
+        self.image_list_pos = random.randint(0,(len(self.image_list) - 1))
         self.current_image = 'snowflake'
         
         self.contrast_list = ['','-50','-25','-125']
@@ -423,7 +423,7 @@ class Experiment_Staging(FloatLayout):
 
         self.current_correction = 0
 
-        self.image_list_pos = random.randint(0,len(self.image_list))
+        self.image_list_pos = random.randint(0,(len(self.image_list) - 1))
         self.current_image = self.image_list[self.image_list_pos]
 
 
