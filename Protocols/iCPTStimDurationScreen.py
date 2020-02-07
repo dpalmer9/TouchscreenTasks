@@ -110,7 +110,7 @@ class Experiment_Staging(FloatLayout):
         self.current_trial = 1
         self.current_total_hits = 0
         self.current_total_miss = 0
-        self.hit_threshold = 10
+        self.hit_threshold = 20
         self.threshold_increment = self.hit_threshold
         self.current_stage = 0 # 1=main, 1=sd probe, 2=iti, 3=contrast,4=flanker
         self.time_elapsed = 0
@@ -426,7 +426,7 @@ class Experiment_Staging(FloatLayout):
             self.remove_widget(self.delay_hold_button)
             self.block_hold()
             return
-        if self.current_total_miss >= 50 and self.current_stage > 0:
+        if self.current_total_miss >= 20 and self.current_stage > 0:
             self.remove_widget(self.delay_hold_button)
             self.end_experiment_screen()
             return
