@@ -94,6 +94,16 @@ def Route_Switch(protocol,parameters):
         main_app = prt.Experiment_App()
         main_app.set(trial_max=trial_max,session_max = session_max, id_entry = id_entry)
         main_app.run()
+    elif protocol == 'iCPTStimImageScreen':
+        trial_max= parameters[0]
+        session_max = parameters[1]
+        id_entry = parameters[2]
+
+        import Protocols.iCPTStimImageScreen as prt
+        Activate()
+        main_app = prt.Experiment_App()
+        main_app.set(trial_max=trial_max,session_max = session_max, id_entry = id_entry)
+        main_app.run()
 
 def Activate():
     import os
