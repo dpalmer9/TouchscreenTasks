@@ -145,6 +145,9 @@ class Experiment_Staging(FloatLayout):
         self.image_list_pos = random.randint(0,(len(self.image_list) - 1))
         self.current_image = 'snowflake'
 
+        self.limited_hold = 0.4
+        self.limited_hold_image = 'grey'
+
         
         self.contrast_list = ['','-50','-25','-125']
         self.contrast_list_pos = random.randint(0,3)
@@ -299,9 +302,20 @@ class Experiment_Staging(FloatLayout):
             self.image_on_screen = True
             Clock.schedule_interval(self.image_presentation,0.01)
         if (self.current_time - self.image_pres_time) >= self.stimulus_duration:
+            self.remove_widget(self.image_wid)
+            self.image_path = '%s/Images/grey.png' % (self.curr_dir)
+            self.limited_hold_image = ImageButton(source=self.image_path, allow_stretch=True)
+            self.limited_hold_image.size_hint = (.4, .4)
+            self.limited_hold_image.pos = (
+            (self.center_x - (0.2 * self.monitor_x_dim)), (self.center_y - (0.2 * self.monitor_y_dim)))
+            self.limited_hold_image.bind(on_press= self.image_pressed)
+            self.add_widget(self.limited_hold_image)
+
+
+        if (self.current_time - self.image_pres_time) >= (self.stimulus_duration + self.limited_hold):    
             Clock.unschedule(self.image_presentation)
             self.feedback_string = ''
-            self.remove_widget(self.image_wid)
+            self.remove_widget(self.limited_hold_image)
             if self.current_stage == 5 and self.distractor_active == 1:
                 self.remove_widget(self.distractor_one_wid)
                 self.remove_widget(self.distractor_two_wid)
@@ -325,6 +339,7 @@ class Experiment_Staging(FloatLayout):
     def image_pressed(self,*args):
         Clock.unschedule(self.image_presentation)
         self.remove_widget(self.image_wid)
+        self.remove_widget(self.limited_hold_image)
         self.delay_hold_button.unbind(on_release=self.hold_removed_presentation)
         self.delay_hold_button.unbind(on_press=self.hold_returned_presentation)
         self.not_pressed = False
