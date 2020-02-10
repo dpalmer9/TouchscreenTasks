@@ -124,7 +124,7 @@ class Experiment_Staging(FloatLayout):
         self.iti_time = 0.5
         self.presentation_delay_time = 1
         self.feedback_length = 0.5
-        self.stimulus_duration = 1
+        self.stimulus_duration = 0.7
         self.block_hold_time = 5
 
         self.image_list = []
