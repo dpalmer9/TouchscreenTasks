@@ -96,6 +96,7 @@ class Experiment_Staging(FloatLayout):
 
         self.presentation_delay_start = False
         self.image_on_screen = False
+        self.stimulus_on_screen = False
         self.feedback_displayed = False
         self.hold_removed = False
         self.not_pressed = True
@@ -124,7 +125,7 @@ class Experiment_Staging(FloatLayout):
         self.iti_time = 0.5
         self.presentation_delay_time = 1
         self.feedback_length = 0.5
-        self.stimulus_duration = 0.7
+        self.stimulus_duration = 0.4
         self.block_hold_time = 5
 
         self.image_list = []
@@ -145,7 +146,7 @@ class Experiment_Staging(FloatLayout):
         self.image_list_pos = random.randint(0,(len(self.image_list) - 1))
         self.current_image = 'snowflake'
 
-        self.limited_hold = 0.4
+        self.limited_hold = 0.3
         self.limited_hold_image = 'grey'
 
         
@@ -300,8 +301,9 @@ class Experiment_Staging(FloatLayout):
             self.add_widget(self.image_wid)
             self.image_pres_time = time.time()
             self.image_on_screen = True
+            self.stimulus_on_screen = True
             Clock.schedule_interval(self.image_presentation,0.01)
-        if (self.current_time - self.image_pres_time) >= self.stimulus_duration:
+        if ((self.current_time - self.image_pres_time) >= self.stimulus_duration) and self.stimulus_on_screen == True:
             self.remove_widget(self.image_wid)
             self.image_path = '%s/Images/grey.png' % (self.curr_dir)
             self.limited_hold_image = ImageButton(source=self.image_path, allow_stretch=True)
@@ -310,9 +312,10 @@ class Experiment_Staging(FloatLayout):
             (self.center_x - (0.2 * self.monitor_x_dim)), (self.center_y - (0.2 * self.monitor_y_dim)))
             self.limited_hold_image.bind(on_press= self.image_pressed)
             self.add_widget(self.limited_hold_image)
+            self.stimulus_on_screen = False
 
 
-        if (self.current_time - self.image_pres_time) >= (self.stimulus_duration + self.limited_hold):    
+        if ((self.current_time - self.image_pres_time) >= (self.stimulus_duration + self.limited_hold)):    
             Clock.unschedule(self.image_presentation)
             self.feedback_string = ''
             self.remove_widget(self.limited_hold_image)
@@ -500,7 +503,8 @@ class Experiment_Staging(FloatLayout):
         self.remove_widget(self.delay_hold_button)
 
         if self.current_stage >= 1:
-            self.stimulus_duration -= 0.1
+            self.stimulus_duration = self.stimulus_duration / 2
+            self.limited_hold = 0.7 - self.stimulus_duration
 
         self.current_block += 1
         self.current_total_miss = 0
