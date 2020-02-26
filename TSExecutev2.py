@@ -27,11 +27,11 @@ class Touchscreen_UI():
 
         #self.protocol_list = [protocol.replace('.py','') for protocol in self.protocol_list]
 
-        self.protocol_list = ['iCPT','iCPTImage2','iCPTStimDurationScreen','iCPTImageScreen','iCPTStimImageScreen','vPRL','PAL','TUNL','PR']
+        self.protocol_list = ['iCPT','vPRL','PAL','TUNL','PR']
 
         self.main_screen = tk.Tk()
 
-        self.protocol_title = tk.Label(self.main_screen, text='TouchCog Launcher v0-1-0')
+        self.protocol_title = tk.Label(self.main_screen, text='TouchCog Launcher v0-1-1')
         self.protocol_title.grid(row=0,column=1)
 
         self.author_title = tk.Label(self.main_screen, text='Daniel Palmer,PhD')
@@ -76,11 +76,17 @@ class Touchscreen_UI():
         self.y_dim = self.y_dim.replace('\n','')
         self.y_dim = int(self.y_dim)
         self.fullscreen_var = tk.IntVar()
+        self.development_var = tk.IntVar()
         self.fullscreen = self.configurations[2]
         self.fullscreen = self.fullscreen.replace('fullscreen = ','')
         self.fullscreen = self.fullscreen.replace('\n','')
         self.fullscreen = int(self.fullscreen)
         self.fullscreen_var.set(self.fullscreen)
+        self.development = self.configurations[3]
+        self.development = self.development.replace('development = ','')
+        self.development = self.development.replace('\n','')
+        self.development = int(self.development)
+        self.development_var.set(self.development)
         self.config_file.close()
         
         self.configuration_menu_top = tk.Toplevel() 
@@ -105,9 +111,13 @@ class Touchscreen_UI():
         self.fullscreen_checkbox = tk.Checkbutton(self.configuration_menu_top,text='Fullscreen',
                                                   variable=self.fullscreen_var)
         self.fullscreen_checkbox.grid(row=3,column=1)
+
+        self.development_protocols_checkbox = tk.Checkbutton(self.configuration_menu_top,text='Development Protocols',
+                                                             variable=self.development_var)
+        self.development_protocols_checkbox.grid(row=4,column=1)
         
         self.accept_button = tk.Button(self.configuration_menu_top,text='Accept',command=self.close_configuration)
-        self.accept_button.grid(row=4,column=1)
+        self.accept_button.grid(row=5,column=1)
         
     def close_configuration(self):
         self.x_dim = str(self.x_res_field.get())
@@ -116,10 +126,25 @@ class Touchscreen_UI():
         self.y_setting = 'y_dim = %s\n' % (self.y_dim)
         self.fullscreen_set = str(self.fullscreen_var.get())
         self.fullscreen_setting = 'fullscreen = %s\n' % (self.fullscreen_set)
-        self.settings = [self.x_setting,self.y_setting,self.fullscreen_setting]
+
+        self.development_set = str(self.development_var.get())
+        self.development_setting = 'development = %s\n' % (self.development_set)
+        self.settings = [self.x_setting,self.y_setting,self.fullscreen_setting,self.development_setting]
         self.config_file = open(self.config_path,'w')
         self.config_file.writelines(self.settings)
         self.config_file.close()
+
+        if self.development_var.get() == 1:
+            self.protocol_list = ['iCPT','iCPTImage2','iCPTStimDurationScreen','iCPTImageScreen','iCPTStimImageScreen','vPRL','PAL','TUNL','PR']
+            self.protocol_listbox.delete(0,END)
+            for protocol in self.protocol_list:
+                self.protocol_listbox.insert(END, protocol)
+        elif self.development_var.get() == 0:
+            self.protocol_list = ['iCPT','vPRL','PAL','TUNL','PR']
+            self.protocol_listbox.delete(0,END)
+            for protocol in self.protocol_list:
+                self.protocol_listbox.insert(END, protocol)
+        
         self.configuration_menu_top.destroy()
 
 
