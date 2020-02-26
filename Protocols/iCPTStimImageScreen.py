@@ -129,7 +129,7 @@ class Experiment_Staging(FloatLayout):
         self.block_hold_time = 5
 
         self.image_list = []
-        self.image_prob = 0.33
+        self.image_prob = 0.5
         self.target_item = '4'
         self.distractor_list = ['1','2','3','5','9','10','11','13','14','15','16','20','30']
         self.distractor_count = round(((1 - self.image_prob) / len(self.distractor_list)) * 100,0)
