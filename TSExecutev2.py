@@ -19,6 +19,24 @@ class Touchscreen_UI():
         self.main_path = os.getcwd()
         self.protocol_path = self.main_path + "\\Protocols\\"
 
+
+        if sys.platform == 'linux'or sys.platform == 'darwin':
+            self.config_path = self.main_path + '/Configuration.ttconfig'
+        elif sys.platform == 'win32':
+            self.config_path = self.main_path + '\\Configuration.ttconfig'
+        self.config_file = open(self.config_path,'r')
+        self.configurations = self.config_file.readlines()
+        self.development = self.configurations[3]
+        self.development = self.development.replace('development = ','')
+        self.development = self.development.replace('\n','')
+        self.development = int(self.development)
+        self.config_file.close()
+
+        if self.development == 0:
+            self.protocol_list = ['iCPT','vPRL','PAL','TUNL','PR']
+        elif self.development == 1:
+            self.protocol_list = ['iCPT','iCPTImage2','iCPTStimDurationScreen','iCPTImageScreen','iCPTStimImageScreen','vPRL','PAL','TUNL','PR']
+
         #self.protocol_list = list()
 
         #for file in os.listdir(self.protocol_path):
@@ -27,7 +45,6 @@ class Touchscreen_UI():
 
         #self.protocol_list = [protocol.replace('.py','') for protocol in self.protocol_list]
 
-        self.protocol_list = ['iCPT','vPRL','PAL','TUNL','PR']
 
         self.main_screen = tk.Tk()
 
