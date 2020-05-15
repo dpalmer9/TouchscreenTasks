@@ -122,7 +122,7 @@ class Experiment_Staging(FloatLayout):
         self.feedback_length = 0.5
         self.stimulus_duration = 1
 
-        self.image_list = ['left','right']
+        self.image_list = ['horizontal','vertical']
         self.train_list = ['snowflake','grey']
         self.image_pos = [-1,1]
         self.image_one_selected = random.randint(0,1)
