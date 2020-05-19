@@ -11,6 +11,7 @@ import tkinter as tk
 import os
 import Protocol_Configure as prc
 import sys
+import numpy as np
 
 ## TKinter-Object ##
 
@@ -35,7 +36,7 @@ class Touchscreen_UI():
         if self.development == 0:
             self.protocol_list = ['iCPT','vPRL','PAL','TUNL','PR']
         elif self.development == 1:
-            self.protocol_list = ['iCPT','iCPTImage2','iCPTStimDurationScreen','iCPTImageScreen','iCPTStimImageScreen','vPRL','PAL','TUNL','PR']
+            self.protocol_list = ['iCPT','iCPTImage2','iCPT2','vPRL','PAL','TUNL','PR']
 
         #self.protocol_list = list()
 
