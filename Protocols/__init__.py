@@ -61,6 +61,23 @@ def Route_Switch(protocol,parameters):
         main_app = prt.Experiment_App()
         main_app.set(trial_max=trial_max,session_max = session_max, block_max=block_max, block_count = block_count, probe_check = probe_check, id_entry = id_entry)
         main_app.run()
+    elif protocol == 'iCPT2':
+        trial_max= parameters[0]
+        session_max = parameters[1]
+        block_max = parameters[2]
+        block_count = parameters[3]
+        stimulus_duration = parameters[4]
+        limited_hold = parameters[5]
+        target_prob = parameters[6]
+        probe_check = parameters[7]
+        id_entry = parameters[8]
+
+        import Protocols.iCPT2 as prt
+        Activate()
+        main_app = prt.Experiment_App()
+        main_app.set(trial_max=trial_max,session_max = session_max, block_max=block_max, block_count = block_count,stimulus_duration=stimulus_duration,
+                     limited_hold=limited_hold,target_prob=target_prob,probe_check = probe_check, id_entry = id_entry)
+        main_app.run()
     elif protocol == 'iCPTImage2':
         trial_max= parameters[0]
         session_max = parameters[1]
