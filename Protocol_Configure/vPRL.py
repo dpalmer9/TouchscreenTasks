@@ -24,7 +24,7 @@ class Experiment_Configuration():
 
         self.reward_prob_input = tk.Entry(self.main_run)
         self.reward_prob_input.grid(row=2,column=2)
-        self.reward_prob_input.insert(tk.END,'0.9')
+        self.reward_prob_input.insert(tk.END,'0.8')
 
         self.reversal_threshold_label = tk.Label(self.main_run,text='Reversal Threshold:')
         self.reversal_threshold_label.grid(row=3,column=0)
