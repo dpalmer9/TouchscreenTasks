@@ -341,6 +341,7 @@ class Experiment_Staging(FloatLayout):
     def image_pressed(self,*args):
         Clock.unschedule(self.image_presentation)
         self.remove_widget(self.image_wid)
+        self.remove_widget(self.limited_hold_image)
         self.delay_hold_button.unbind(on_release=self.hold_removed_presentation)
         self.delay_hold_button.unbind(on_press=self.hold_returned_presentation)
         self.not_pressed = False
