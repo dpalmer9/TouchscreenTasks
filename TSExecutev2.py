@@ -34,9 +34,9 @@ class Touchscreen_UI():
         self.config_file.close()
 
         if self.development == 0:
-            self.protocol_list = ['iCPT','vPRL','PAL','TUNL','PR']
+            self.protocol_list = ['iCPT','vPRL','PAL','TUNL','PR',"iCPT2"]
         elif self.development == 1:
-            self.protocol_list = ['iCPT','iCPTImage2','iCPT2','vPRL','PAL','TUNL','PR']
+            self.protocol_list = ['iCPT','iCPTImage2','iCPTStimDurationScreen','iCPTImageScreen','iCPTStimImageScreen','vPRL','PAL','TUNL','PR',"iCPT2"]
 
         #self.protocol_list = list()
 
@@ -49,7 +49,7 @@ class Touchscreen_UI():
 
         self.main_screen = tk.Tk()
 
-        self.protocol_title = tk.Label(self.main_screen, text='TouchCog Launcher v0-1-1')
+        self.protocol_title = tk.Label(self.main_screen, text='TouchCog Launcher v0-1-2')
         self.protocol_title.grid(row=0,column=1)
 
         self.author_title = tk.Label(self.main_screen, text='Daniel Palmer,PhD')
@@ -153,12 +153,12 @@ class Touchscreen_UI():
         self.config_file.close()
 
         if self.development_var.get() == 1:
-            self.protocol_list = ['iCPT','iCPTImage2','iCPTStimDurationScreen','iCPTImageScreen','iCPTStimImageScreen','vPRL','PAL','TUNL','PR']
+            self.protocol_list = ['iCPT','iCPTImage2','iCPTStimDurationScreen','iCPTImageScreen','iCPTStimImageScreen','vPRL','PAL','TUNL','PR',"iCPT2"]
             self.protocol_listbox.delete(0,END)
             for protocol in self.protocol_list:
                 self.protocol_listbox.insert(END, protocol)
         elif self.development_var.get() == 0:
-            self.protocol_list = ['iCPT','vPRL','PAL','TUNL','PR']
+            self.protocol_list = ['iCPT','vPRL','PAL','TUNL','PR','iCPT2']
             self.protocol_listbox.delete(0,END)
             for protocol in self.protocol_list:
                 self.protocol_listbox.insert(END, protocol)
