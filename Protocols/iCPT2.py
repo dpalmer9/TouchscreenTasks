@@ -147,7 +147,7 @@ class Experiment_Staging(FloatLayout):
             self.image_prob_list.append(self.target_prob_indiv)
         for a in range(0,len(self.incorrect_image_list)):
             self.image_prob_list.append(self.distractor_prob_indiv)
-        self.current_image = 'snowflake'
+        self.current_image = self.correct_image_list[random.randint(0,1)]
         self.current_image_label = self.current_image
         
         self.contrast_list = ['','-50','-25','-125']
@@ -259,11 +259,10 @@ class Experiment_Staging(FloatLayout):
                 
             elif self.current_stage == 0:
                 if sys.platform == 'linux'or sys.platform == 'darwin':
-                    self.image_path = '%s/Images/snowflake.png' % (self.curr_dir)
+                    self.image_path = '%s/Images/%s.png' % (self.curr_dir,self.current_image)
                 elif sys.platform == 'win32':
-                    self.image_path = '%s\\Images\\snowflake.png' % (self.curr_dir)
+                    self.image_path = '%s\\Images\\%s.png' % (self.curr_dir,self.current_image)
                 self.image_wid = ImageButton(source=self.image_path,allow_stretch=True)
-                self.current_image = 'snowflake'
             else:
                 if sys.platform == 'linux'or sys.platform == 'darwin':
                     self.image_path = '%s/Images/%s.png' % (self.curr_dir, self.current_image)
@@ -487,7 +486,7 @@ class Experiment_Staging(FloatLayout):
             self.iti_duration_pos = random.randint(0,2)
             self.iti_time = self.iti_duration_list[self.iti_duration_pos]
         if self.current_stage == 0:
-            self.current_image = 'snowflake'
+            self.current_image = self.correct_image_list[random.randint(0,1)]
             self.current_image_label = self.current_image
 
         if self.not_pressed == True:
