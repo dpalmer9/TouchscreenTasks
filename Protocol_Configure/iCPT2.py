@@ -51,7 +51,7 @@ class Experiment_Configuration():
 
         self.limited_hold_input = tk.Entry(self.configure_screen)
         self.limited_hold_input.grid(row=5,column=2)
-        self.limited_hold_input.insert(tk.END,"0.3")
+        self.limited_hold_input.insert(tk.END,"1.0")
 
         self.target_prob_label = tk.Label(self.configure_screen,text="Target Probability (0-1): ")
         self.target_prob_label.grid(row=6,column=0)
