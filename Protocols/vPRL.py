@@ -132,6 +132,13 @@ class Experiment_Staging(FloatLayout):
 
         while self.image_one_selected == self.image_two_selected:
             self.image_two_selected = random.randint(0,1)
+
+        if self.image_one_selected == 0:
+            self.left_image = self.train_list[0]
+            self.right_image = self.train_list[1]
+        elif self.image_one_selected == 1:
+            self.left_image = self.train_list[1]
+            self.right_image = self.train_list[0]
             
         self.trial_contingency = self.train_list[self.image_one_selected] + '-' + self.train_list[self.image_two_selected]
 
@@ -144,8 +151,12 @@ class Experiment_Staging(FloatLayout):
 
         self.start_condition = random.randint(0,1)
 
-        self.image_one_reward_threshold = self.reward_prob_spos
-        self.image_two_reward_threshold = self.reward_prob_smin
+        #self.image_one_reward_threshold = self.reward_prob_spos
+        #self.image_two_reward_threshold = self.reward_prob_smin
+        self.s_plus = self.train_list[0]
+        self.s_minus = self.train_list[1]
+        self.s_plus_rewarded = 1
+        self.s_minus_rewarded = 0
 
 
 
@@ -174,7 +185,7 @@ class Experiment_Staging(FloatLayout):
         if os.path.exists(self.participant_data_folder) == False:
             os.makedirs(self.participant_data_folder)
         self.participant_data_path = self.participant_data_folder + 'vPRL %s.csv' % (self.id_no)
-        self.data_col_names = 'TrialNo, Current Stage, Reversal #, Trial Type, Correct, Reward Contingency, Response Latency'
+        self.data_col_names =  'TrialNo, Current Stage, Reversal #, S+ Image, S- Image, Left Image, Right Image,S+ Reward Probability, S+ Rewarded, S- Rewarded, S+ Response, Response Latency'
         self.data_file = open(self.participant_data_path, "w+")
         self.data_file.write(self.data_col_names)
         self.data_file.close()
@@ -383,7 +394,7 @@ class Experiment_Staging(FloatLayout):
     def record_data(self):
         self.data_file = open(self.participant_data_path, "a")
         self.data_file.write("\n")
-        self.data_file.write("%s,%s,%s,%s,%s,%s,%s" % (self.current_trial,self.stage_label,self.current_reversal,self.trial_contingency,self.current_correct,self.current_reward,self.lat))
+        self.data_file.write("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s" % (self.current_trial,self.stage_label,self.current_reversal,self.s_plus,self.s_minus,self.left_image,self.right_image,self.reward_prob_smin,self.s_plus_rewarded,self.s_minus_rewarded,self.current_correct,self.lat))
         self.data_file.close()
 
         if self.current_correct == 0:
@@ -411,21 +422,58 @@ class Experiment_Staging(FloatLayout):
             self.current_reversal += 1
             self.total_correct = 0
             self.stage_label = 'Main Task - Reversal ' + str(self.current_reversal)
-            if self.image_one_reward_threshold == self.reward_prob_spos:
+            if self.start_condition == 0:
                 self.start_condition = 1
                 self.image_one_reward_threshold = self.reward_prob_smin
                 self.image_two_reward_threshold = self.reward_prob_spos
-            elif self.image_one_reward_threshold == self.reward_prob_smin:
+                self.s_plus = self.image_list[1]
+                self.s_minus = self.image_list[0]
+            elif self.start_condition == 1:
                 self.start_condition = 0
                 self.image_one_reward_threshold = self.reward_prob_spos
                 self.image_two_reward_threshold = self.reward_prob_smin
+                self.s_plus = self.image_list[0]
+                self.s_minus = self.image_list[1]
 
         while self.image_one_selected == self.image_two_selected:
             self.image_two_selected = random.randint(0,1)
         if self.current_stage == 0:
             self.trial_contingency = self.train_list[self.image_one_selected] + '-' + self.train_list[self.image_two_selected]
+
+            if self.image_one_selected == 0:
+                self.left_image = self.train_list[0]
+                self.right_image = self.train_list[1]
+            elif self.image_one_selected == 1:
+                self.left_image = self.train_list[1]
+                self.right_image = self.train_list[0]
         if self.current_stage == 1:
             self.trial_contingency = self.image_list[self.image_one_selected] + '-' + self.image_list[self.image_two_selected]
+            if self.current_stage == 0:
+                if self.image_one_probability > self.image_one_reward_threshold:
+                    self.s_plus_rewarded = 1
+                else:
+                    self.s_plus_rewarded = 0
+
+                if self.image_two_probability > self.image_two_reward_threshold:
+                    self.s_minus_rewarded = 1
+                else:
+                    self.s_minus_rewarded = 0
+            elif self.current_stage == 1:
+                if self.image_one_probability > self.image_one_reward_threshold:
+                    self.s_minus_rewarded = 1
+                else:
+                    self.s_minus_rewarded = 0
+
+                if self.image_two_probability > self.image_two_reward_threshold:
+                    self.s_plus_rewarded = 1
+                else:
+                    self.s_plus_rewarded = 0
+            if self.image_one_selected == 0:
+                self.left_image = self.image_list[0]
+                self.right_image = self.image_list[1]
+            elif self.image_one_selected == 1:
+                self.left_image = self.image_list[1]
+                self.right_image = self.image_list[0]
 
 
     def block_hold(self,*args):
@@ -441,6 +489,19 @@ class Experiment_Staging(FloatLayout):
         self.reward_prob_spos = 100 - self.reward_prob_smin
         self.image_one_reward_threshold = self.reward_prob_spos
         self.image_two_reward_threshold = self.reward_prob_smin
+
+        if self.start_condition == 0:
+            self.start_condition = 1
+            self.image_one_reward_threshold = self.reward_prob_smin
+            self.image_two_reward_threshold = self.reward_prob_spos
+            self.s_plus = self.image_list[1]
+            self.s_minus = self.image_list[0]
+        elif self.start_condition == 1:
+            self.start_condition = 0
+            self.image_one_reward_threshold = self.reward_prob_spos
+            self.image_two_reward_threshold = self.reward_prob_smin
+            self.s_plus = self.image_list[0]
+            self.s_minus = self.image_list[1]
 
         self.scoreboard_wid.text = 'Your Points:\n       %s' % (self.current_score)
         self.stage_label = 'Main Task - Reversal 0'
@@ -537,7 +598,23 @@ class Experiment_Staging(FloatLayout):
         self.end_button.bind(on_press = self.end_experiment)
 
         self.add_widget(self.end_feedback)
-        self.add_widget(self.end_button)
+        self.end_button_time_stage()
+
+    def end_button_time_stage(self, *args):
+        if self.end_button_active == False:
+            Clock.schedule_interval(self.end_button_time_stage, 0.01)
+            self.start_end_hold = time.time()
+            self.end_button_active = True
+        if (self.end_button_active == True) and ((self.current_time - self.start_end_hold) >= self.end_hold_time):
+            Clock.unschedule(self.end_button_time_stagee)
+            self.end_button_active = False
+            self.end_button = Button(text='EXIT')
+            self.end_button.size_hint = (.2, .1)
+            self.end_button.pos = ((self.center_x - (0.1 * self.monitor_x_dim)),
+                                   (self.center_y - (0.05 * self.monitor_y_dim) + (-0.4 * self.monitor_y_dim)))
+            self.end_button.bind(on_press=self.end_experiment)
+            self.add_widget(self.block_button)
+            self.add_widget(self.end_button)
 
 
     def end_experiment(self,*args):
