@@ -126,6 +126,7 @@ class Experiment_Staging(FloatLayout):
         self.train_list = ['snowflake','grey']
         self.image_pos = [-1,1]
         self.image_one_selected = random.randint(0,1)
+        self.side_selected = "Left"
 
 
         self.image_two_selected = random.randint(0,1)
@@ -145,7 +146,7 @@ class Experiment_Staging(FloatLayout):
         self.image_one_probability = random.randint(1,100)
         self.image_one_reward_threshold = 0
         self.image_two_probability = random.randint(1,100)
-        self.image_two_reward_threshold = 0
+        self.image_two_reward_threshold = 100
 
         self.reversal_threshold = reversal_threshold
 
@@ -185,7 +186,7 @@ class Experiment_Staging(FloatLayout):
         if os.path.exists(self.participant_data_folder) == False:
             os.makedirs(self.participant_data_folder)
         self.participant_data_path = self.participant_data_folder + 'vPRL %s.csv' % (self.id_no)
-        self.data_col_names =  'TrialNo, Current Stage, Reversal #, S+ Image, S- Image, Left Image, Right Image,S+ Reward Probability, S+ Rewarded, S- Rewarded, S+ Response, Response Latency'
+        self.data_col_names =  'TrialNo, Current Stage, Reversal #, S+ Image, S- Image, Left Image, Right Image,S+ Reward Probability, S+ Rewarded, S- Rewarded, S+ Response,Side Selected, Response Latency'
         self.data_file = open(self.participant_data_path, "w+")
         self.data_file.write(self.data_col_names)
         self.data_file.close()
@@ -341,6 +342,11 @@ class Experiment_Staging(FloatLayout):
             self.feedback_string = '[color=FF0000]NO POINTS[/color]'
             self.current_reward = 0
 
+        if self.image_pos[self.image_one_selected] == -1:
+            self.side_selected = "Left"
+        else:
+            self.side_selected = "Right"
+
         self.feedback_report()
         self.record_data()
         self.set_new_trial_configuration()
@@ -369,6 +375,11 @@ class Experiment_Staging(FloatLayout):
             self.feedback_string = '[color=FF0000]NO POINTS[/color]'
             self.current_reward = 0
 
+        if self.image_pos[self.image_two_selected] == -1:
+            self.side_selected = "Left"
+        else:
+            self.side_selected = "Right"
+
         self.feedback_report()
         self.record_data()
         self.set_new_trial_configuration()
@@ -394,7 +405,7 @@ class Experiment_Staging(FloatLayout):
     def record_data(self):
         self.data_file = open(self.participant_data_path, "a")
         self.data_file.write("\n")
-        self.data_file.write("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s" % (self.current_trial,self.stage_label,self.current_reversal,self.s_plus,self.s_minus,self.left_image,self.right_image,self.reward_prob_smin,self.s_plus_rewarded,self.s_minus_rewarded,self.current_correct,self.lat))
+        self.data_file.write("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s" % (self.current_trial,self.stage_label,self.current_reversal,self.s_plus,self.s_minus,self.left_image,self.right_image,self.reward_prob_smin,self.s_plus_rewarded,self.s_minus_rewarded,self.current_correct,self.side_selected,self.lat))
         self.data_file.close()
 
         if self.current_correct == 0:
