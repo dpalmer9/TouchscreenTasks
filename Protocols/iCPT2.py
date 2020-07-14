@@ -149,7 +149,9 @@ class Experiment_Staging(FloatLayout):
             self.image_prob_list.append(self.target_prob_indiv)
         for a in range(0,len(self.incorrect_image_list)):
             self.image_prob_list.append(self.distractor_prob_indiv)
-        self.current_image = self.correct_image_list[random.randint(0,1)]
+        self.correct_image_list = ['snowflake']
+        self.correct_image_list_len = len(self.correct_image_list)
+        self.current_image = self.correct_image_list[random.randint(0,(self.correct_image_list_len - 1))]
         self.current_image_label = self.current_image
         
         self.contrast_list = ['','-50','-25','-125']
@@ -301,6 +303,7 @@ class Experiment_Staging(FloatLayout):
             self.image_pres_time = time.time()
             self.image_on_screen = True
             self.stimulus_on_screen = True
+            self.limited_hold_image = ImageButton(source=self.image_path, allow_stretch=True)
             Clock.schedule_interval(self.image_presentation,0.01)
         if ((self.current_time - self.image_pres_time) >= self.stimulus_duration) and self.stimulus_on_screen == True:
             self.remove_widget(self.image_wid)
@@ -486,7 +489,8 @@ class Experiment_Staging(FloatLayout):
             self.iti_duration_pos = random.randint(0,2)
             self.iti_time = self.iti_duration_list[self.iti_duration_pos]
         if self.current_stage == 0:
-            self.current_image = self.correct_image_list[random.randint(0,1)]
+            self.correct_image_list_len = len(self.correct_image_list)
+            self.current_image = self.correct_image_list[random.randint(0,(self.correct_image_list_len - 1))]
             self.current_image_label = self.current_image
 
         if self.not_pressed == True:
@@ -532,6 +536,7 @@ class Experiment_Staging(FloatLayout):
             self.hit_threshold -= self.threshold_increment
             self.hit_threshold += 10
             self.stage_label == 'Main Task'
+            self.correct_image_list = ['10', '4']
         if self.current_stage == 1:
             self.stage_label = 'Main Task'
         if self.current_stage == 2:
