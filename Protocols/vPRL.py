@@ -147,6 +147,7 @@ class Experiment_Staging(FloatLayout):
         self.image_one_reward_threshold = 0
         self.image_two_probability = random.randint(1,100)
         self.image_two_reward_threshold = 100
+        self.image_probability = random.randint(1, 100)
 
         self.reversal_threshold = reversal_threshold
 
@@ -329,18 +330,34 @@ class Experiment_Staging(FloatLayout):
         if self.image_one_reward_threshold < self.image_two_reward_threshold:
             self.current_correct = 1
             self.total_correct += 1
+            if (self.image_probability > self.reward_prob_spos):
+                self.feedback_string = '[color=008000]YOU WIN 50 POINTS[/color]'
+                self.current_reward = 1
+                self.current_score += 50
+                self.scoreboard_wid.text = 'Your Points:\n       %s' % (self.current_score)
+            else:
+                self.feedback_string = '[color=FF0000]NO POINTS[/color]'
+                self.current_reward = 0
         else:
             self.current_correct = 0
             self.total_correct = 0
+            if (self.image_probability <= self.reward_prob_spos):
+                self.feedback_string = '[color=008000]YOU WIN 50 POINTS[/color]'
+                self.current_reward = 1
+                self.current_score += 50
+                self.scoreboard_wid.text = 'Your Points:\n       %s' % (self.current_score)
+            else:
+                self.feedback_string = '[color=FF0000]NO POINTS[/color]'
+                self.current_reward = 0
 
-        if self.image_one_probability > self.image_one_reward_threshold:
-            self.feedback_string = '[color=008000]YOU WIN 50 POINTS[/color]'
-            self.current_reward = 1
-            self.current_score += 50
-            self.scoreboard_wid.text = 'Your Points:\n       %s' % (self.current_score)
-        else:
-            self.feedback_string = '[color=FF0000]NO POINTS[/color]'
-            self.current_reward = 0
+        #if self.image_one_probability > self.image_one_reward_threshold:
+            #self.feedback_string = '[color=008000]YOU WIN 50 POINTS[/color]'
+            #self.current_reward = 1
+            #self.current_score += 50
+            #self.scoreboard_wid.text = 'Your Points:\n       %s' % (self.current_score)
+        #else:
+            #self.feedback_string = '[color=FF0000]NO POINTS[/color]'
+            #self.current_reward = 0
 
         if self.image_pos[self.image_one_selected] == -1:
             self.side_selected = "Left"
@@ -362,18 +379,35 @@ class Experiment_Staging(FloatLayout):
         if self.image_one_reward_threshold > self.image_two_reward_threshold:
             self.current_correct = 1
             self.total_correct += 1
+            if (self.image_probability > self.reward_prob_spos):
+                self.feedback_string = '[color=008000]YOU WIN 50 POINTS[/color]'
+                self.current_reward = 1
+                self.current_score += 50
+                self.scoreboard_wid.text = 'Your Points:\n       %s' % (self.current_score)
+            else:
+                self.feedback_string = '[color=FF0000]NO POINTS[/color]'
+                self.current_reward = 0
         else:
             self.current_correct = 0
             self.total_correct = 0
+            if (self.image_probability <= self.reward_prob_spos):
+                self.feedback_string = '[color=008000]YOU WIN 50 POINTS[/color]'
+                self.current_reward = 1
+                self.current_score += 50
+                self.scoreboard_wid.text = 'Your Points:\n       %s' % (self.current_score)
+            else:
+                self.feedback_string = '[color=FF0000]NO POINTS[/color]'
+                self.current_reward = 0
 
-        if self.image_two_probability > self.image_two_reward_threshold:
-            self.feedback_string = '[color=008000]YOU WIN 50 POINTS[/color]'
-            self.current_reward = 1
-            self.current_score += 50
-            self.scoreboard_wid.text = 'Your Points:\n       %s' % (self.current_score)
-        else:
-            self.feedback_string = '[color=FF0000]NO POINTS[/color]'
-            self.current_reward = 0
+
+        #if self.image_two_probability > self.image_two_reward_threshold:
+            #self.feedback_string = '[color=008000]YOU WIN 50 POINTS[/color]'
+            #self.current_reward = 1
+            #self.current_score += 50
+            #self.scoreboard_wid.text = 'Your Points:\n       %s' % (self.current_score)
+        #else:
+            #self.feedback_string = '[color=FF0000]NO POINTS[/color]'
+            #self.current_reward = 0
 
         if self.image_pos[self.image_two_selected] == -1:
             self.side_selected = "Left"
@@ -422,8 +456,11 @@ class Experiment_Staging(FloatLayout):
         self.current_correction = 0
         self.current_trial += 1
 
-        self.image_one_probability = random.randint(1, 100)
-        self.image_two_probability = random.randint(1, 100)
+        self.image_probability = random.randint(1,100)
+        #self.image_one_probability = random.randint(1, 100)
+        #print("Current Val 1: %d , Target Val 1: %d" % (self.image_one_probability,self.image_one_reward_threshold))
+        #self.image_two_probability = random.randint(1, 100)
+        #print("Current Val 2: %d , Target Val 2: %d" % (self.image_two_probability, self.image_two_reward_threshold))
 
         self.image_one_selected = random.randint(0,1)
         self.image_two_selected = random.randint(0,1)
@@ -459,26 +496,32 @@ class Experiment_Staging(FloatLayout):
                 self.right_image = self.train_list[0]
         if self.current_stage == 1:
             self.trial_contingency = self.image_list[self.image_one_selected] + '-' + self.image_list[self.image_two_selected]
-            if self.current_stage == 0:
-                if self.image_one_probability > self.image_one_reward_threshold:
-                    self.s_plus_rewarded = 1
-                else:
-                    self.s_plus_rewarded = 0
+            if self.image_probability > self.reward_prob_spos:
+                self.s_plus_rewarded = 1
+                self.s_minus_rewarded = 0
+            else:
+                self.s_plus_rewarded = 0
+                self.s_minus_rewarded = 1
+            #if self.current_stage == 0:
+                #if self.image_one_probability > self.image_one_reward_threshold:
+                    #self.s_plus_rewarded = 1
+                #else:
+                    #self.s_plus_rewarded = 0
 
-                if self.image_two_probability > self.image_two_reward_threshold:
-                    self.s_minus_rewarded = 1
-                else:
-                    self.s_minus_rewarded = 0
-            elif self.current_stage == 1:
-                if self.image_one_probability > self.image_one_reward_threshold:
-                    self.s_minus_rewarded = 1
-                else:
-                    self.s_minus_rewarded = 0
+                #if self.image_two_probability > self.image_two_reward_threshold:
+                    #self.s_minus_rewarded = 1
+                #else:
+                    #self.s_minus_rewarded = 0
+            #elif self.current_stage == 1:
+                #if self.image_one_probability > self.image_one_reward_threshold:
+                    #self.s_minus_rewarded = 1
+                #else:
+                    #self.s_minus_rewarded = 0
 
-                if self.image_two_probability > self.image_two_reward_threshold:
-                    self.s_plus_rewarded = 1
-                else:
-                    self.s_plus_rewarded = 0
+                #if self.image_two_probability > self.image_two_reward_threshold:
+                    #self.s_plus_rewarded = 1
+                #else:
+                    #self.s_plus_rewarded = 0
             if self.image_one_selected == 0:
                 self.left_image = self.image_list[0]
                 self.right_image = self.image_list[1]
