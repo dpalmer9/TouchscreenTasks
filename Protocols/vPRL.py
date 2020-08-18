@@ -164,7 +164,6 @@ class Experiment_Staging(FloatLayout):
         self.reward_distribution_list_size = 10**(self.decimal_values)
         self.reward_distribution_count = int(self.reward_distribution_list_size * self.reward_prob)
         self.reward_distribution = ([0] * (self.reward_distribution_list_size - self.reward_distribution_count)) + ([1] * (self.reward_distribution_count))
-        self.reward_distribution self.reward_distribution
         random.shuffle(self.reward_distribution)
 
         self.image_probability_index = 0
