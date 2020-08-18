@@ -147,7 +147,28 @@ class Experiment_Staging(FloatLayout):
         self.image_one_reward_threshold = 0
         self.image_two_probability = random.randint(1,100)
         self.image_two_reward_threshold = 100
-        self.image_probability = random.randint(1, 100)
+
+
+        #self.image_probability = random.randint(1, 100)
+        #self.probability_distribution = list(range(1,11))
+        #self.probability_distribution_list_size = self.max_trials
+        #while (self.probability_distribution_list_size % len(self.probability_distribution) ) != 0:
+            #self.probability_distribution_list_size += 1
+
+        #self.probability_distribution_list = self.probability_distribution * (self.probability_distribution_list_size / len (self.probability_distribution))
+        #self.probability_distribution_list = random.shuffle(self.probability_distribution_list)
+        #self.image_probability_index = 0
+        #self.image_probability = self.probability_distribution_list[0]
+        #self.probability_rep
+        self.decimal_values = len(str(self.reward_prob - int(self.reward_prob))[2:])
+        self.reward_distribution_list_size = 10**(self.decimal_values)
+        self.reward_distribution_count = int(self.reward_distribution_list_size * self.reward_prob)
+        self.reward_distribution = ([0] * (self.reward_distribution_list_size - self.reward_distribution_count)) + ([1] * (self.reward_distribution_count))
+        self.reward_distribution self.reward_distribution
+        random.shuffle(self.reward_distribution)
+
+        self.image_probability_index = 0
+        self.image_probability = 1
 
         self.reversal_threshold = reversal_threshold
 
@@ -330,7 +351,7 @@ class Experiment_Staging(FloatLayout):
         if self.image_one_reward_threshold < self.image_two_reward_threshold:
             self.current_correct = 1
             self.total_correct += 1
-            if (self.image_probability > self.reward_prob_spos):
+            if (self.image_probability == 1):
                 self.feedback_string = '[color=008000]YOU WIN 50 POINTS[/color]'
                 self.current_reward = 1
                 self.current_score += 50
@@ -341,7 +362,7 @@ class Experiment_Staging(FloatLayout):
         else:
             self.current_correct = 0
             self.total_correct = 0
-            if (self.image_probability <= self.reward_prob_spos):
+            if (self.image_probability == 0):
                 self.feedback_string = '[color=008000]YOU WIN 50 POINTS[/color]'
                 self.current_reward = 1
                 self.current_score += 50
@@ -379,7 +400,7 @@ class Experiment_Staging(FloatLayout):
         if self.image_one_reward_threshold > self.image_two_reward_threshold:
             self.current_correct = 1
             self.total_correct += 1
-            if (self.image_probability > self.reward_prob_spos):
+            if (self.image_probability == 1):
                 self.feedback_string = '[color=008000]YOU WIN 50 POINTS[/color]'
                 self.current_reward = 1
                 self.current_score += 50
@@ -390,7 +411,7 @@ class Experiment_Staging(FloatLayout):
         else:
             self.current_correct = 0
             self.total_correct = 0
-            if (self.image_probability <= self.reward_prob_spos):
+            if (self.image_probability == 0):
                 self.feedback_string = '[color=008000]YOU WIN 50 POINTS[/color]'
                 self.current_reward = 1
                 self.current_score += 50
@@ -456,7 +477,20 @@ class Experiment_Staging(FloatLayout):
         self.current_correction = 0
         self.current_trial += 1
 
-        self.image_probability = random.randint(1,100)
+        if self.current_stage == 0:
+            self.image_probability = 1
+        else:
+            self.image_probability = self.reward_distribution[self.image_probability_index]
+            self.image_probability_index += 1
+            if self.image_probability_index >= len(self.reward_distribution):
+                self.reward_distribution = ([0] * (
+                            self.reward_distribution_list_size - self.reward_distribution_count)) + (
+                                                       [1] * (self.reward_distribution_count))
+                random.shuffle(self.reward_distribution)
+
+                self.image_probability_index = 0
+
+        #self.image_probability = random.randint(1,100)
         #self.image_one_probability = random.randint(1, 100)
         #print("Current Val 1: %d , Target Val 1: %d" % (self.image_one_probability,self.image_one_reward_threshold))
         #self.image_two_probability = random.randint(1, 100)
@@ -496,7 +530,7 @@ class Experiment_Staging(FloatLayout):
                 self.right_image = self.train_list[0]
         if self.current_stage == 1:
             self.trial_contingency = self.image_list[self.image_one_selected] + '-' + self.image_list[self.image_two_selected]
-            if self.image_probability > self.reward_prob_spos:
+            if self.image_probability == 1:
                 self.s_plus_rewarded = 1
                 self.s_minus_rewarded = 0
             else:
