@@ -317,6 +317,7 @@ class Experiment_Staging(FloatLayout):
             (self.center_x - (0.2 * self.monitor_x_dim) + (0.2 * self.image_pos[self.image_one_selected] * self.monitor_x_dim)), (self.center_y - (0.2 * self.monitor_y_dim)))
             self.one_image_wid.bind(on_press= self.response_one)
             self.add_widget(self.one_image_wid)
+            self.image_on_screen = True
 
             if self.current_stage == 1:
                 if sys.platform == 'linux'or sys.platform == 'darwin':
@@ -472,6 +473,13 @@ class Experiment_Staging(FloatLayout):
         if (self.current_stage == 0) & (self.current_trial > 10):
             self.block_hold()
             return
+        
+        if (self.current_trial > self.max_trials) or ((self.current_time - self.initiation_start_time) > self.max_time):
+            self.end_experiment_screen()
+        
+        if (self.current_reversal >= self.max_reversal):
+            self.end_experiment_screen()
+            
 
         self.current_correction = 0
         self.current_trial += 1
@@ -665,7 +673,7 @@ class Experiment_Staging(FloatLayout):
             if self.current_trial >= self.max_trials:
                 self.end_experiment_screen()
                 return
-            if self.current_reversal > self.max_reversal:
+            if self.current_reversal >= self.max_reversal:
                 self.end_experiment_screen()
                 return
             self.image_presentation()
