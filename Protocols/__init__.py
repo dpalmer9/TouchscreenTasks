@@ -19,6 +19,15 @@ def Route_Switch(protocol,parameters):
         main_app = prt.Experiment_App()
         main_app.set(trial_max=trial_max,session_max=session_max,block_length=block_length,block_count=block_count,id_entry=id_entry)
         main_app.run()
+        
+    elif protocol == 'PR2':
+        session_max = parameters[0]
+        reward_type = parameters[1]
+        id_entry = parameters[2]
+        import Protocols.PR2 as prt
+        main_app = prt.Experiment_App()
+        main_app.set(session_max=session_max,reward_type=reward_type,id_entry=id_entry)
+        main_app.run()
 
     elif protocol == 'vPRL':
         import Protocols.vPRL as prt
