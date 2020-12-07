@@ -19,5 +19,7 @@ def Route_Switch(protocol,root_screen):
         import Protocol_Configure.iCPTStimImageScreen as prca
     elif protocol == 'PR':
         import Protocol_Configure.PR as prca
+    elif protocol == 'PR2':
+        import Protocol_Configure.PR2 as prca
 
     prca.Experiment_Configuration(root_screen=root_screen)
