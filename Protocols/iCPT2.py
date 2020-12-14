@@ -30,6 +30,8 @@ Config.set('kivy', 'keyboard_mode', 'systemandmulti')
 Config.set('graphics', 'fullscreen', fullscreen)
 Config.set('graphics', 'width', monitor_x_dim)
 Config.set('graphics', 'height', monitor_y_dim)
+Config.set('kivy', 'exit_on_escape',1)
+
 import kivy
 from kivy.app import App
 from kivy.uix.widget import Widget

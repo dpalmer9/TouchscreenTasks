@@ -29,6 +29,8 @@ Config.set('kivy', 'keyboard_mode', 'systemandmulti')
 Config.set('graphics', 'fullscreen', fullscreen)
 Config.set('graphics', 'width', monitor_x_dim)
 Config.set('graphics', 'height', monitor_y_dim)
+Config.set('kivy', 'exit_on_escape',1)
+
 import kivy
 from kivy.app import App
 from kivy.uix.widget import Widget
@@ -101,18 +103,19 @@ class Experiment_Staging(FloatLayout):
         self.max_time = session_max
         self.id_no = id_entry
         
-
+        self.pr_threshold_default = 4
         self.current_ratio_multiplier = 2
         self.pr_threshold = 4
         self.threshold_index = 1
         self.threshold_raise_max = 4
         self.current_response = 0
-        self.current_points = 0
         self.reward_type = reward_type
         if self.reward_type == 0:
+            self.current_points = 0
             self.current_reward_size = 200
             self.reward_list = [200,100,50]
         elif self.reward_type == 1:
+            self.current_points = 0.00
             self.current_reward_size = 2.00
             self.reward_list = [2.00,1.00,0.50]
             
@@ -127,7 +130,10 @@ class Experiment_Staging(FloatLayout):
 
         self.iti_time = 0.5
 
-        self.feedback_string = 'Reward: %s Points' % (str(self.current_points))
+        if self.reward_type == 0:
+            self.feedback_string = 'Reward: %s Points' % (str(self.current_points))
+        elif self.reward_type == 1:
+            self.feedback_string = 'Reward: $%.2f' % (self.current_points)
 
 
         self.sample_x_shift = random.randint(-3,4)
@@ -257,7 +263,10 @@ class Experiment_Staging(FloatLayout):
         self.pr_threshold *= self.current_ratio_multiplier
         self.current_response = 0
         self.current_points += self.current_reward_size
-        self.feedback_string = 'Reward: %s Points' % (str(self.current_points))
+        if self.reward_type == 0:
+            self.feedback_string = 'Reward: %s Points' % (str(self.current_points))
+        elif self.reward_type == 1:
+            self.feedback_string = 'Reward: $%.2f' % (self.current_points)
         self.feedback_wid.text = self.feedback_string
         
         self.threshold_index += 1
@@ -302,7 +311,7 @@ class Experiment_Staging(FloatLayout):
         self.remove_widget(self.initiation_image_wid)
         self.current_trial -= 1
         self.reward_list_index += 1
-        self.pr_threshold = 4
+        self.pr_threshold = self.pr_threshold_default
         self.threshold_index = 1
         if self.reward_list_index >= len(self.reward_list):
             self.end_experiment_screen()
