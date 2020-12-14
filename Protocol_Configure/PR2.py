@@ -22,7 +22,7 @@ class Experiment_Configuration():
         self.session_max_input.grid(row=1,column=2)
         self.session_max_input.insert(tk.END,'1200')
         
-        self.reward_type_list = ['Points','Reward']
+        self.reward_type_list = ['Points','Money']
         
         self.reward_type_label = tk.Label(self.main_run,text='Reward Type:')
         self.reward_type_label.grid(row=2,column=0)
